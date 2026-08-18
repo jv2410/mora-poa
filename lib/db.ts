@@ -16,14 +16,15 @@ export async function inserirImovel(im: Imovel): Promise<void> {
   await getPool().query(
     `INSERT INTO imoveis (
        codigo_origem, url_origem, titulo, descricao, preco, condominio, iptu,
-       area, dormitorios, suites, banheiros, vagas, bairro, endereco, cidade,
-       fotos, corretor_nome, corretor_telefone, publicado_em, dados_conflitantes
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
+       area, area_total, dormitorios, suites, banheiros, vagas, bairro,
+       endereco, cidade, fotos, corretor_nome, corretor_telefone,
+       publicado_em, dados_conflitantes
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
      ON CONFLICT (codigo_origem) DO NOTHING`,
     [im.codigo_origem, im.url_origem, im.titulo, im.descricao, im.preco,
-     im.condominio, im.iptu, im.area, im.dormitorios, im.suites, im.banheiros,
-     im.vagas, im.bairro, im.endereco, im.cidade, im.fotos, im.corretor_nome,
-     im.corretor_telefone, im.publicado_em, im.dados_conflitantes]
+     im.condominio, im.iptu, im.area, im.area_total, im.dormitorios, im.suites,
+     im.banheiros, im.vagas, im.bairro, im.endereco, im.cidade, im.fotos,
+     im.corretor_nome, im.corretor_telefone, im.publicado_em, im.dados_conflitantes]
   )
 }
 
@@ -36,6 +37,7 @@ function normalizar(row: any): Imovel {
     condominio: num(row.condominio),
     iptu: num(row.iptu),
     area: num(row.area),
+    area_total: num(row.area_total),
     preco_m2: num(row.preco_m2),
     custo_mensal: num(row.custo_mensal),
     fotos: row.fotos ?? [],

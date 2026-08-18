@@ -8,6 +8,7 @@ export type Imovel = {
   condominio: number | null
   iptu: number | null
   area: number | null
+  area_total: number | null
   dormitorios: number | null
   suites: number | null
   banheiros: number | null

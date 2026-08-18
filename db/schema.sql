@@ -36,3 +36,7 @@ CREATE TABLE IF NOT EXISTS imoveis (
 CREATE INDEX IF NOT EXISTS idx_imoveis_preco       ON imoveis (preco);
 CREATE INDEX IF NOT EXISTS idx_imoveis_bairro      ON imoveis (bairro);
 CREATE INDEX IF NOT EXISTS idx_imoveis_dormitorios ON imoveis (dormitorios);
+
+-- Área total (inclui comum), do JSON-LD. A coluna `area` guarda a privativa,
+-- que é o número do título do anúncio e o que o comprador usa para comparar.
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS area_total NUMERIC(8,2);

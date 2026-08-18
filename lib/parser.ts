@@ -65,19 +65,35 @@ export function parsearImovel(html: string, url: string): Imovel | null {
   const dormTit = mDorm ? Number(mDorm[1]) : null
   const areaTit = mArea ? Number(mArea[1].replace(/\./g, '').replace(',', '.')) : null
 
-  // O título do anúncio é a fonte de verdade quando diverge do JSON-LD:
-  // é o que o corretor escreveu e o que o comprador lê.
+  // As duas fontes medem coisas diferentes, e ambas estão certas:
+  //   - o título traz a área PRIVATIVA e conta as suítes entre os quartos;
+  //   - o JSON-LD traz a área TOTAL (com comum) e conta menos quartos.
+  // Guardamos as duas. `area` é a privativa, porque é o número que aparece no
+  // anúncio e o que o comprador usa para comparar imóveis.
   const dormitorios = dormTit ?? dormLd
   const area = areaTit ?? areaLd
+  const area_total = areaLd != null && areaTit != null && areaLd >= areaTit ? areaLd : null
+
+  // A flag sinaliza anomalia real, não a diferença semântica acima — um aviso
+  // que dispara em quase todo imóvel não informa nada e só corrói a confiança.
+  // Nota: JSON-LD com MAIS quartos que o título também é semântico — em studio
+  // e garden ele conta a sala como cômodo. Não entra aqui.
   const dados_conflitantes =
-    (dormTit != null && dormLd != null && dormTit !== dormLd) ||
-    (areaTit != null && areaLd != null && Math.abs(areaTit - areaLd) > 1)
+    // área privativa maior que a total é fisicamente impossível
+    (areaTit != null && areaLd != null && areaTit > areaLd + 1) ||
+    // sem preço utilizável
+    !Number.isFinite(
+      precoPorNome(comoLista(offer.priceSpecification), 'Valor do imóvel') ??
+        Number(offer.price)
+    )
 
   // listing.name tem o formato "Apartamento - Centro Histórico - Porto Alegre"
   const partes = String(listing.name ?? '')
     .split(' - ')
     .map((s) => s.trim())
-  const bairro = partes.length >= 3 ? partes[1] : (addr.addressLocality ?? 'Porto Alegre')
+  const bairroBruto =
+    partes.length >= 3 ? partes[1] : (addr.addressLocality ?? 'Porto Alegre')
+  const bairro = normalizarBairro(bairroBruto)
 
   const fotos: string[] = (listing.image ?? [])
     .map((i: Node | string) => (typeof i === 'string' ? i : i.url))
@@ -94,6 +110,7 @@ export function parsearImovel(html: string, url: string): Imovel | null {
     condominio: precoPorNome(comoLista(offer.priceSpecification), 'Condomínio'),
     iptu: precoPorNome(comoLista(offer.priceSpecification), 'IPTU'),
     area,
+    area_total,
     dormitorios,
     suites: propriedade(comoLista(listing.additionalProperty), 'Suítes'),
     banheiros:
@@ -108,6 +125,22 @@ export function parsearImovel(html: string, url: string): Imovel | null {
     publicado_em: listing.datePosted ?? null,
     dados_conflitantes,
   }
+}
+
+/**
+ * O portal grava o mesmo bairro em caixas diferentes ("BOM FIM" e "Bom Fim"),
+ * o que faria a vitrine listar um bairro duas vezes. Title Case resolve,
+ * preservando as minúsculas de ligação usadas em nomes ("Moinhos de Vento").
+ */
+const LIGACOES = new Set(['de', 'da', 'do', 'das', 'dos', 'e'])
+
+export function normalizarBairro(s: string): string {
+  return s
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((p, i) => (i > 0 && LIGACOES.has(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+    .join(' ')
 }
 
 export function extrairIdsDaListagem(html: string): string[] {
