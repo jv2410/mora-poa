@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# mora.ai
 
-## Getting Started
+Plataforma de busca de imóveis em Porto Alegre onde a pessoa **conversa** em vez de
+preencher filtro. A IA extrai os critérios da conversa, consulta um banco de 100
+apartamentos reais e devolve os melhores ranqueados — com a explicação do que bate
+e do que não bate em cada um.
 
-First, run the development server:
+## O que faz
+
+- **Banco real:** 100 apartamentos à venda em Porto Alegre, coletados das páginas
+  públicas da Auxiliadora Predial. Moinhos de Vento, Santana, Bom Fim, Cidade Baixa
+  e Petrópolis.
+- **Chat que não inventa:** todo imóvel citado existe e todo número vem do banco.
+  O ranking é calculado em TypeScript; o modelo apenas narra o resultado.
+- **Ranking explicável:** cada imóvel tem score de 0 a 100 e duas listas — o que
+  atende e o que não atende aos critérios da pessoa.
+
+## Rodando
+
+Pré-requisitos: Node 20+, Postgres 12+ rodando localmente.
 
 ```bash
+# 1. Dependências
+npm install
+
+# 2. Banco
+createdb imoveis
+psql -d imoveis -f db/schema.sql
+
+# 3. Variáveis de ambiente
+cp .env.local.example .env.local   # e preencha ANTHROPIC_API_KEY
+
+# 4. Popular o banco (~3 min, faz 107 requisições a 1 req/s)
+npm run coletar
+
+# 5. Subir
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variáveis
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variável | Para quê |
+|---|---|
+| `DATABASE_URL` | Conexão com o Postgres |
+| `ANTHROPIC_API_KEY` | Chat com `claude-opus-5` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Testes
 
-## Learn More
+```bash
+npm test
+```
 
-To learn more about Next.js, take a look at the following resources:
+30 testes. Os do parser rodam contra HTML real capturado do portal
+(`tests/fixtures/`), incluindo um anúncio cuja informação estruturada diverge do
+título. Os das tools rodam contra o banco populado.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Arquitetura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Arquivo | Responsabilidade |
+|---|---|
+| `scripts/coletar.ts` | Descobre IDs por bairro, busca cada anúncio, grava |
+| `lib/parser.ts` | HTML → `Imovel`, cruzando JSON-LD com o título |
+| `lib/db.ts` | Pool e queries, todas parametrizadas |
+| `lib/score.ts` | Ranking — função pura, sem LLM |
+| `lib/tools.ts` | As 3 tools que a IA pode chamar |
+| `lib/claude.ts` | Loop de tool use com streaming |
+| `app/api/chat/route.ts` | SSE |
+| `styles/system.css` | Design system |
 
-## Deploy on Vercel
+### Por que o ranking não fica com o LLM
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A tool devolve o score já calculado junto das listas `atende` / `nao_atende`, e o
+modelo é instruído a narrar essas listas — não a recalcular. É o que separa uma
+ferramenta confiável de um chat que inventa imóvel com confiança. Numa decisão de
+onde morar, um número inventado custa caro.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Duas coisas que a fonte ensinou
+
+**Área privativa e área total são coisas diferentes.** O JSON-LD do portal traz a
+área total; o título do anúncio traz a privativa e conta as suítes entre os
+quartos. Na primeira versão isso foi tratado como erro e a flag de inconsistência
+disparou em 95 dos 100 imóveis. Um alerta que aparece em 95% dos casos não alerta
+nada — só ensina o usuário a ignorá-lo. Hoje guardamos as duas medidas e a flag
+marca só anomalia real (1 imóvel).
+
+**O portal grava o mesmo bairro em caixas diferentes.** "BOM FIM" e "Bom Fim"
+viravam dois bairros na vitrine. O parser normaliza em Title Case, preservando as
+minúsculas de ligação ("Moinhos de Vento").
+
+## Limite conhecido
+
+A ingestão é scraping das páginas públicas do portal, com rate limit de 1 req/s,
+User-Agent identificável e `robots.txt` respeitado (que permite `/` inclusive para
+`ClaudeBot`, e proíbe `/api/` — por isso a coleta usa só HTML público). As imagens
+são referenciadas do CDN de origem, não reempacotadas.
+
+Isso serve para POC. **Antes de qualquer uso público, a camada de ingestão precisa
+virar feed oficial ou parceria com a imobiliária.** O schema é agnóstico à origem
+justamente para que essa troca não toque no resto do sistema.
