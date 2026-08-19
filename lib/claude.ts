@@ -49,8 +49,43 @@ Escreva em português do Brasil, direto e sem enrolação. Nada de emoji.`
 export type EventoChat =
   | { tipo: 'texto'; texto: string }
   | { tipo: 'imoveis'; imoveis: unknown[] }
+  | { tipo: 'status'; tool: string; detalhe: string }
   | { tipo: 'erro'; mensagem: string }
   | { tipo: 'fim' }
+
+const brl = (n: number) =>
+  Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+
+/**
+ * Traduz a chamada de tool para uma frase de gente, com os critérios reais.
+ *
+ * Isso não é um spinner enfeitado: durante os 20 segundos de espera, é a prova
+ * visível de que os números vêm de uma consulta ao banco e não da cabeça do
+ * modelo. O item de confiança e o de loading resolvidos pela mesma frase.
+ */
+function narrarTool(nome: string, input: any): string {
+  switch (nome) {
+    case 'buscar_imoveis': {
+      const p: string[] = []
+      if (input?.dorm_min) p.push(`${input.dorm_min} quartos`)
+      if (input?.vagas_min) p.push(`${input.vagas_min} vaga${input.vagas_min > 1 ? 's' : ''}`)
+      if (input?.area_min) p.push(`a partir de ${input.area_min} m²`)
+      if (input?.preco_max) p.push(`até ${brl(input.preco_max)}`)
+      if (input?.bairros?.length) p.push(`em ${input.bairros.slice(0, 3).join(', ')}`)
+      return p.length ? `buscando ${p.join(', ')}…` : 'buscando no banco…'
+    }
+    case 'contexto_mercado':
+      return 'comparando com os imóveis semelhantes do bairro…'
+    case 'simular_compra':
+      return 'calculando ITBI, cartório e parcela…'
+    case 'comparar_imoveis':
+      return 'montando a comparação lado a lado…'
+    case 'detalhar_imovel':
+      return 'abrindo a ficha completa…'
+    default:
+      return 'consultando o banco…'
+  }
+}
 
 const MAX_ITERACOES = 8
 
@@ -64,8 +99,13 @@ export async function* conversar(
       model: 'claude-opus-5',
       max_tokens: 8000,
       thinking: { type: 'adaptive' },
-      output_config: { effort: 'medium' },
-      system: SYSTEM,
+      // O trabalho difícil está nas tools, que são determinísticas — o modelo
+      // só narra o resultado. Effort baixo corta latência e custo sem tocar na
+      // qualidade do que importa.
+      output_config: { effort: 'low' },
+      // tools e system são renderizados antes das messages e formam um prefixo
+      // estável: cacheá-lo derruba o custo de input de toda conversa longa.
+      system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       tools: TOOLS as unknown as Anthropic.Tool[],
       messages: historico,
     })
@@ -87,6 +127,7 @@ export async function* conversar(
     const resultados: Anthropic.ToolResultBlockParam[] = []
 
     for (const c of chamadas) {
+      yield { tipo: 'status', tool: c.name, detalhe: narrarTool(c.name, c.input) }
       const saida = await executarTool(c.name, c.input)
       if (Array.isArray(saida?.imoveis) && saida.imoveis.length > 0) {
         yield { tipo: 'imoveis', imoveis: saida.imoveis }

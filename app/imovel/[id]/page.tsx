@@ -1,14 +1,45 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav'
 import AbrirChat from '@/components/AbrirChat'
-import { brl } from '@/components/CardImovel'
+import { brl } from '@/lib/formato'
 import { porId, getPool } from '@/lib/db'
 import { contextoMercado } from '@/lib/mercado'
 import FaixaMercado from '@/components/FaixaMercado'
 import Atributos, { type Atributo } from '@/components/Atributos'
 import CustoReal from '@/components/CustoReal'
 
-export const dynamic = 'force-dynamic'
+// Uma ficha compartilhada no WhatsApp pode receber um pico de tráfego; ISR
+// faz isso virar serving estático em vez de N consultas ao banco.
+export const revalidate = 3600
+
+const brlMeta = (n: number) =>
+  Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+
+/**
+ * O canal de distribuição deste produto é o WhatsApp: alguém acha um
+ * apartamento e manda pro cônjuge. Sem metadata, o preview do link é o título
+ * genérico do site e ninguém clica.
+ */
+export async function generateMetadata(props: PageProps<'/imovel/[id]'>) {
+  const { id } = await props.params
+  const im = await porId(Number(id))
+  if (!im) return { title: 'Imóvel não encontrado — mora.ai' }
+
+  const titulo = `${brlMeta(im.preco)} · ${im.dormitorios ?? '?'} dorm · ${im.bairro}`
+  const partes = [
+    im.area ? `${im.area} m² privativos` : null,
+    im.vagas ? `${im.vagas} vaga${im.vagas > 1 ? 's' : ''}` : 'sem vaga',
+    im.condominio ? `condomínio ${brlMeta(im.condominio)}` : null,
+  ].filter(Boolean)
+
+  return {
+    title: `${titulo} — mora.ai`,
+    description: partes.join(' · '),
+    openGraph: { title: titulo, description: partes.join(' · '), type: 'article' },
+  }
+}
+
 
 // Next 16: params é sempre uma Promise.
 export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
@@ -48,9 +79,9 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
       <Nav />
       <section className="section-pad" style={{ paddingTop: 40 }}>
         <div className="wrap">
-          <a href="/imoveis" className="tag" style={{ display: 'inline-block', marginBottom: 24 }}>
+          <Link href="/imoveis" className="tag" style={{ display: 'inline-block', marginBottom: 24 }}>
             ← voltar para o catálogo
-          </a>
+          </Link>
 
           {im.fotos.length > 0 ? (
             <div
@@ -67,6 +98,7 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
                   src={f}
                   alt=""
                   loading={i === 0 ? 'eager' : 'lazy'}
+                  referrerPolicy="no-referrer"
                   style={{
                     width: '100%',
                     height: i === 0 ? 360 : 175,

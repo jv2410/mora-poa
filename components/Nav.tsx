@@ -1,14 +1,16 @@
+import Link from 'next/link'
+
 export default function Nav() {
   return (
     <div className="wrap">
       <nav className="nav">
-        <a href="/" className="marca">
+        <Link href="/" className="marca">
           mora<span>.ai</span>
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="/imoveis">Imóveis</a>
-          <a href="/#como">Como funciona</a>
-          <a href="/#bairros">Bairros</a>
+          <Link href="/chat">Conversar</Link>
+          <Link href="/imoveis">Imóveis</Link>
+          <Link href="/dados">De onde vêm os dados</Link>
         </div>
       </nav>
     </div>

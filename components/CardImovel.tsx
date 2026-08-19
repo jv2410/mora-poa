@@ -1,24 +1,31 @@
-import type { ImovelComScore } from '@/lib/tipos'
+'use client'
 
-export const brl = (n: number | null | undefined) =>
-  n == null
-    ? '—'
-    : Number(n).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        maximumFractionDigits: 0,
-      })
+import Link from 'next/link'
+import { useState } from 'react'
+import type { ImovelComScore } from '@/lib/tipos'
+import { brl } from '@/lib/formato'
+
 
 type Props = { im: Partial<ImovelComScore> & { id?: number } }
 
 export default function CardImovel({ im }: Props) {
+  // As fotos vêm de CDNs de terceiros e vão quebrar com o tempo. Um ícone de
+  // imagem quebrada num catálogo é o oposto de confiança.
+  const [semFoto, setSemFoto] = useState(false)
+  const temFoto = Boolean(im.fotos?.[0]) && !semFoto
+
   return (
-    <a href={`/imovel/${im.id}`} className="card" style={{ display: 'block' }}>
-      {im.fotos?.[0] ? (
+    <Link href={`/imovel/${im.id}`} className="card" style={{ display: 'block' }}>
+      {temFoto ? (
         <img
-          src={im.fotos[0]}
+          src={im.fotos![0]}
           alt=""
           loading="lazy"
+          // Os CDNs do Grupo OLX bloqueiam hotlink por Referer. Sem isto o
+          // browser manda o nosso domínio no header e leva 403, enquanto um
+          // curl sem referer passa — foi exatamente o sintoma observado.
+          referrerPolicy="no-referrer"
+          onError={() => setSemFoto(true)}
           style={{
             width: '100%',
             height: 190,
@@ -27,7 +34,9 @@ export default function CardImovel({ im }: Props) {
             marginBottom: 16,
           }}
         />
-      ) : null}
+      ) : (
+        <div className="foto-vazia">{im.bairro ?? 'sem foto'}</div>
+      )}
 
       {im.score != null ? (
         <div className="pill" style={{ marginBottom: 12 }}>
@@ -59,6 +68,6 @@ export default function CardImovel({ im }: Props) {
           ⚠ dados inconsistentes no anúncio original
         </p>
       ) : null}
-    </a>
+    </Link>
   )
 }
