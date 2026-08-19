@@ -1,5 +1,6 @@
 export type Imovel = {
   id?: number
+  fonte: string
   codigo_origem: string
   url_origem: string
   titulo: string
@@ -16,6 +17,9 @@ export type Imovel = {
   bairro: string
   endereco: string | null
   cidade: string
+  latitude: number | null
+  longitude: number | null
+  caracteristicas: string[]
   fotos: string[]
   corretor_nome: string | null
   corretor_telefone: string | null

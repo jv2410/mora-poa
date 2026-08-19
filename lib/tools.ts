@@ -11,7 +11,7 @@ export const TOOLS = [
       '"nao_atende" já calculadas. Chame assim que tiver ao menos um critério concreto — ' +
       'não espere ter todos. Informe apenas os critérios que a pessoa realmente mencionou: ' +
       'critério não informado não penaliza nenhum imóvel. Bairros disponíveis no banco: ' +
-      'Moinhos de Vento, Santana, Bom Fim, Cidade Baixa, Petrópolis.',
+      "Moinhos de Vento, Petrópolis, Bela Vista, Bom Fim, Santana, Cidade Baixa, Jardim Europa, Menino Deus, Auxiliadora, Humaitá, Vila Nova, Morro Santana, Cavalhada, Centro Histórico, Rubem Berta, Passo da Areia, Santa Tereza, Farrapos, Cristal, Partenon, Sarandi, Tristeza e outros.",
     strict: true,
     input_schema: {
       type: 'object',

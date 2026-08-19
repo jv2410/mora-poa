@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'fs'
-import { parsearImovel, extrairIdsDaListagem, normalizarBairro } from '@/lib/parser'
+import { parsearImovel, extrairIdsDaListagem, normalizarBairro } from '@/lib/fontes/auxiliadora'
 
 const html = readFileSync('tests/fixtures/imovel-484012.html', 'utf-8')
 const listagem = readFileSync('tests/fixtures/listagem-poa.html', 'utf-8')
@@ -9,7 +9,10 @@ describe('parsearImovel', () => {
   const im = parsearImovel(html, 'https://www.auxiliadorapredial.com.br/imovel/venda/484012')!
 
   it('extrai identificação e preços', () => {
-    expect(im.codigo_origem).toBe('484012')
+    // Prefixado com a fonte: nada impede a Foxter e a Auxiliadora de terem
+    // anúncios com o mesmo número, e a coluna é UNIQUE.
+    expect(im.codigo_origem).toBe('auxiliadora-484012')
+    expect(im.fonte).toBe('auxiliadora')
     expect(im.preco).toBe(575000)
     expect(im.condominio).toBe(1003.9)
     expect(im.iptu).toBe(1500)

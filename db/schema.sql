@@ -40,3 +40,11 @@ CREATE INDEX IF NOT EXISTS idx_imoveis_dormitorios ON imoveis (dormitorios);
 -- Área total (inclui comum), do JSON-LD. A coluna `area` guarda a privativa,
 -- que é o número do título do anúncio e o que o comprador usa para comparar.
 ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS area_total NUMERIC(8,2);
+
+-- Multi-fonte: de qual portal veio o anúncio, e os campos que só algumas
+-- fontes publicam (a Guarida traz geolocalização e características).
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS fonte TEXT NOT NULL DEFAULT 'auxiliadora';
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS latitude NUMERIC(10,7);
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS longitude NUMERIC(10,7);
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS caracteristicas TEXT[];
+CREATE INDEX IF NOT EXISTS idx_imoveis_fonte ON imoveis (fonte);

@@ -3,6 +3,7 @@ import { scoreImovel, ranquear } from '@/lib/score'
 import type { Imovel } from '@/lib/tipos'
 
 const base: Imovel = {
+  fonte: 'teste', latitude: null, longitude: null, caracteristicas: [],
   codigo_origem: '1', url_origem: 'x', titulo: 'Apto', descricao: null,
   preco: 500000, condominio: 800, iptu: 1200, area: 80, area_total: 110,
   dormitorios: 2, suites: 1, banheiros: 2, vagas: 1,
