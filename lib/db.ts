@@ -34,7 +34,37 @@ export function getPool(): Pool {
   return pool
 }
 
-export async function inserirImovel(im: Imovel): Promise<void> {
+/**
+ * Os portais publicam valores impossíveis: a Guarida anuncia condomínio de
+ * R$ 47.336 para um apartamento de R$ 420 mil. Não é erro de parsing — é o
+ * que está no site deles.
+ *
+ * Um condomínio mensal acima de 1% do valor do imóvel não existe: seriam 12%
+ * do preço por ano, só de taxa. A regra é relativa de propósito, porque
+ * cobertura de R$ 8 milhões com condomínio de R$ 10 mil é perfeitamente real
+ * e um teto absoluto a descartaria.
+ *
+ * Valor implausível vira NULL e liga `dados_conflitantes` — some do cálculo,
+ * mas não some da vista do usuário.
+ */
+export function sanear(im: Imovel): Imovel {
+  const limite = im.preco * 0.01
+  const condSuspeito = im.condominio != null && im.condominio > limite
+  // IPTU anual em POA fica entre 0,3% e 1,5% do valor venal; 3% já é teto folgado.
+  const iptuSuspeito = im.iptu != null && im.iptu > im.preco * 0.03
+
+  if (!condSuspeito && !iptuSuspeito) return im
+
+  return {
+    ...im,
+    condominio: condSuspeito ? null : im.condominio,
+    iptu: iptuSuspeito ? null : im.iptu,
+    dados_conflitantes: true,
+  }
+}
+
+export async function inserirImovel(bruto: Imovel): Promise<void> {
+  const im = sanear(bruto)
   await getPool().query(
     `INSERT INTO imoveis (
        fonte, codigo_origem, url_origem, titulo, descricao, preco, condominio,

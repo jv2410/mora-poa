@@ -73,3 +73,41 @@ CREATE TABLE IF NOT EXISTS historico_precos (
   visto_em      DATE NOT NULL DEFAULT current_date,
   UNIQUE (codigo_origem, visto_em)
 );
+
+-- Eficiência da planta: quanto da área que você paga é realmente sua.
+-- Um fator de 0,55 significa que 45% do m² pago é corredor e área comum.
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS eficiencia NUMERIC(4,3)
+  GENERATED ALWAYS AS (
+    CASE WHEN area_total > 0 AND area > 0 AND area <= area_total
+    THEN area / area_total END
+  ) STORED;
+
+-- Custo de 10 anos: preço + condomínio e IPTU pagos ao longo de 120 meses.
+-- NULL quando o condomínio não foi informado — de propósito. Com COALESCE 0
+-- o anúncio que esconde o condomínio venceria o ranking, ou seja, a falta de
+-- informação viraria vantagem competitiva. Preferimos não ranquear.
+ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS custo_10_anos NUMERIC(14,2)
+  GENERATED ALWAYS AS (
+    CASE WHEN condominio IS NOT NULL
+    THEN preco + (condominio + COALESCE(iptu, 0) / 12) * 120 END
+  ) STORED;
+
+CREATE INDEX IF NOT EXISTS idx_imoveis_custo_10a ON imoveis (custo_10_anos);
+CREATE INDEX IF NOT EXISTS idx_imoveis_eficiencia ON imoveis (eficiencia);
+
+-- Atributos extraídos das FOTOS. A evidência aqui não é uma citação de texto,
+-- é o índice da foto onde o modelo diz ter visto aquilo — apontável e
+-- verificável: se apontar para a foto 40 de um anúncio com 12, é descartado,
+-- e na interface o chip abre exatamente a foto citada.
+CREATE TABLE IF NOT EXISTS atributos_visuais (
+  imovel_id   INT NOT NULL REFERENCES imoveis(id) ON DELETE CASCADE,
+  atributo    TEXT NOT NULL,
+  valor       BOOLEAN NOT NULL,
+  foto_index  SMALLINT NOT NULL,
+  foto_url    TEXT NOT NULL,
+  modelo      TEXT NOT NULL,
+  extraido_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (imovel_id, atributo)
+);
+CREATE INDEX IF NOT EXISTS idx_visuais_atributo ON atributos_visuais (atributo, valor);
+CREATE INDEX IF NOT EXISTS idx_visuais_imovel ON atributos_visuais (imovel_id);

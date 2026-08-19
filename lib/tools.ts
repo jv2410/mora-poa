@@ -2,8 +2,10 @@ import { buscar, porId, porIds } from './db'
 import { ranquear, scoreImovel } from './score'
 import type { Criterios } from './tipos'
 import { contextoMercado } from './mercado'
-import { simularCompra } from './financiamento'
+import { simularCompra, custoOportunidade } from './financiamento'
 import { raioX } from './raioX'
+import { oQueCompra } from './orcamento'
+import { sinaisIncompletos, notaCompletude } from './completude'
 
 export const TOOLS = [
   {
@@ -105,6 +107,24 @@ export const TOOLS = [
     },
   },
   {
+    name: 'o_que_compra',
+    description:
+      'Dado um orçamento, mostra o apartamento mediano que esse dinheiro compra ' +
+      'em cada bairro de Porto Alegre, com quantos imóveis existem em cada um. ' +
+      'Use quando a pessoa disser quanto tem para gastar mas não souber onde ' +
+      'procurar, ou perguntar onde consegue morar com o dinheiro que tem.',
+    strict: true,
+    input_schema: {
+      type: 'object',
+      properties: {
+        orcamento: { type: 'number', description: 'Quanto a pessoa tem para gastar, em reais' },
+        dorm: { type: ['integer', 'null'], description: 'Mínimo de dormitórios, se relevante' },
+      },
+      required: ['orcamento', 'dorm'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'simular_compra',
     description:
       'Calcula quanto custa de verdade comprar o imóvel: ITBI, escritura, ' +
@@ -154,13 +174,35 @@ export async function executarTool(nome: string, input: any): Promise<any> {
     }
     case 'detalhar_imovel': {
       const im = await porId(Number(input.id))
-      return im ? { imovel: im } : { erro: `Nenhum imóvel com id ${input.id}.` }
+      if (!im) return { erro: `Nenhum imóvel com id ${input.id}.` }
+      const ctx = await contextoMercado(im.id!)
+      return {
+        imovel: im,
+        completude: notaCompletude(im),
+        // O que o anúncio não conta é matéria de negociação, não detalhe.
+        leve_para_a_visita: sinaisIncompletos(im, ctx),
+      }
     }
     case 'comparar_imoveis': {
       const ids = (input.ids ?? []).map(Number)
       if (ids.length < 2) return { erro: 'Informe ao menos 2 ids para comparar.' }
       const imoveis = await porIds(ids.slice(0, 4))
-      return { imoveis: imoveis.map((i) => scoreImovel(i, {})) }
+      const ordenados = [...imoveis].sort((a, b) => a.preco - b.preco)
+      const barato = ordenados[0]
+      const caro = ordenados[ordenados.length - 1]
+
+      return {
+        imoveis: imoveis.map((i) => ({
+          ...scoreImovel(i, {}),
+          completude: notaCompletude(i),
+          sinais_incompletos: sinaisIncompletos(i).map((s) => s.detalhe),
+        })),
+        // Reenquadra a decisão: o mais caro precisa valer essa diferença.
+        custo_oportunidade:
+          caro.preco > barato.preco
+            ? custoOportunidade(caro.preco - barato.preco)
+            : null,
+      }
     }
     case 'raio_x_bairros': {
       const x = await raioX(input?.dorm ?? null)
@@ -173,6 +215,11 @@ export async function executarTool(nome: string, input: any): Promise<any> {
         razao_caro_barato: x.razao,
         bairros: x.bairros,
       }
+    }
+
+    case 'o_que_compra': {
+      const r = await oQueCompra(Number(input.orcamento), input?.dorm ?? null)
+      return r
     }
 
     case 'contexto_mercado': {

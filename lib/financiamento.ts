@@ -147,3 +147,21 @@ export function simularCompra(args: {
     observacoes,
   }
 }
+
+/**
+ * O que a diferença de preço entre dois imóveis renderia investida.
+ *
+ * Reenquadra a escolha: em vez de "qual é melhor", a pergunta vira "o mais
+ * caro vale essa diferença a mais?". É a conta que ninguém faz ao comparar
+ * dois apartamentos.
+ */
+export function custoOportunidade(diferenca: number, taxaAnual = 0.1, anos = 10) {
+  const futuro = diferenca * Math.pow(1 + taxaAnual, anos)
+  return {
+    diferenca: Math.round(diferenca),
+    taxa_anual: taxaAnual,
+    anos,
+    valor_futuro: Math.round(futuro),
+    ganho: Math.round(futuro - diferenca),
+  }
+}

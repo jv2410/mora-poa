@@ -10,6 +10,33 @@ export type ContextoMercado = {
   preco_m2_imovel: number | null
   delta_mediana_pct: number | null
   leitura: string
+  condominio_m2: CondominioM2 | null
+  eficiencia: Eficiencia | null
+}
+
+/**
+ * Condomínio por m², comparado com imóveis de porte parecido no mesmo bairro.
+ *
+ * A comparação é dentro de uma faixa de área (±20 m²) de propósito: custo de
+ * prédio é largamente fixo, então apartamento pequeno sempre tem condomínio
+ * por m² maior. Comparar um JK contra a mediana geral condenaria todo JK.
+ */
+export type CondominioM2 = {
+  valor: number
+  mediana: number
+  percentil: number
+  amostra: number
+  leitura: string
+}
+
+/** Quanto da área que você paga é realmente sua. */
+export type Eficiencia = {
+  fator: number
+  area_privativa: number
+  area_total: number
+  m2_de_area_comum: number
+  mediana_bairro: number | null
+  amostra: number
 }
 
 /**
@@ -73,6 +100,11 @@ export async function contextoMercado(imovelId: number): Promise<ContextoMercado
       const delta =
         mediana && mediana > 0 ? ((precoM2 - mediana) / mediana) * 100 : null
 
+      const [cond, efi] = await Promise.all([
+        condominioM2(imovelId),
+        eficienciaDaPlanta(imovelId),
+      ])
+
       return {
         amostra,
         base_comparacao: t.rotulo,
@@ -83,6 +115,8 @@ export async function contextoMercado(imovelId: number): Promise<ContextoMercado
         preco_m2_imovel: precoM2,
         delta_mediana_pct: delta == null ? null : Math.round(delta * 10) / 10,
         leitura: leitura(amostra, delta),
+        condominio_m2: cond,
+        eficiencia: efi,
       }
     }
   }
@@ -102,4 +136,78 @@ function leitura(amostra: number, delta: number | null): string {
   if (delta < 8) return 'em linha com a mediana dos comparáveis'
   if (delta < 20) return 'acima da mediana dos comparáveis'
   return 'bem acima da mediana — precisa justificar o prêmio'
+}
+
+
+async function condominioM2(imovelId: number): Promise<CondominioM2 | null> {
+  const pool = getPool()
+  const { rows: base } = await pool.query(
+    `SELECT bairro, area, condominio, condominio / NULLIF(area, 0) valor
+     FROM imoveis WHERE id = $1`,
+    [imovelId]
+  )
+  const b = base[0]
+  if (!b?.valor || !b.area) return null
+  const valor = Number(b.valor)
+
+  const { rows } = await pool.query(
+    `WITH pares AS (
+       SELECT condominio / NULLIF(area, 0) v FROM imoveis
+       WHERE bairro = $1 AND condominio IS NOT NULL AND area IS NOT NULL
+         AND area BETWEEN $2 - 20 AND $2 + 20
+     )
+     SELECT count(*)::int amostra,
+            percentile_cont(0.5) WITHIN GROUP (ORDER BY v) mediana,
+            (SELECT count(*) FROM pares WHERE v < $3)::float / NULLIF(count(*),0) pct
+     FROM pares`,
+    [b.bairro, Number(b.area), valor]
+  )
+
+  const r = rows[0]
+  const amostra = Number(r.amostra)
+  if (amostra < 5 || r.mediana == null) return null
+
+  const mediana = Number(r.mediana)
+  const delta = Math.round(((valor - mediana) / mediana) * 100)
+
+  return {
+    valor: Math.round(valor * 100) / 100,
+    mediana: Math.round(mediana * 100) / 100,
+    percentil: Math.round(Number(r.pct) * 100),
+    amostra,
+    leitura:
+      delta >= 40
+        ? `${delta}% acima dos vizinhos de mesmo porte — prédio caro de manter`
+        : delta <= -30
+          ? `${Math.abs(delta)}% abaixo dos vizinhos de mesmo porte`
+          : 'em linha com prédios de porte parecido no bairro',
+  }
+}
+
+async function eficienciaDaPlanta(imovelId: number): Promise<Eficiencia | null> {
+  const pool = getPool()
+  const { rows } = await pool.query(
+    `SELECT bairro, area, area_total, eficiencia FROM imoveis WHERE id = $1`,
+    [imovelId]
+  )
+  const b = rows[0]
+  if (!b?.eficiencia || !b.area_total) return null
+
+  const { rows: med } = await pool.query(
+    `SELECT count(*)::int amostra,
+            percentile_cont(0.5) WITHIN GROUP (ORDER BY eficiencia) mediana
+     FROM imoveis WHERE bairro = $1 AND eficiencia IS NOT NULL`,
+    [b.bairro]
+  )
+
+  const amostra = Number(med[0]?.amostra ?? 0)
+
+  return {
+    fator: Math.round(Number(b.eficiencia) * 1000) / 1000,
+    area_privativa: Number(b.area),
+    area_total: Number(b.area_total),
+    m2_de_area_comum: Math.round((Number(b.area_total) - Number(b.area)) * 10) / 10,
+    mediana_bairro: amostra >= 5 && med[0].mediana ? Math.round(Number(med[0].mediana) * 1000) / 1000 : null,
+    amostra,
+  }
 }

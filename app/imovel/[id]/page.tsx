@@ -8,6 +8,9 @@ import { contextoMercado } from '@/lib/mercado'
 import FaixaMercado from '@/components/FaixaMercado'
 import Atributos, { type Atributo } from '@/components/Atributos'
 import CustoReal from '@/components/CustoReal'
+import AtributosVisuais, { type AtributoVisual } from '@/components/AtributosVisuais'
+import LeveParaVisita from '@/components/LeveParaVisita'
+import { sinaisIncompletos } from '@/lib/completude'
 
 // Uma ficha compartilhada no WhatsApp pode receber um pico de tráfego; ISR
 // faz isso virar serving estático em vez de N consultas ao banco.
@@ -47,7 +50,7 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
   const im = await porId(Number(id))
   if (!im) notFound()
 
-  const [ctx, atributos] = await Promise.all([
+  const [ctx, atributos, visuais] = await Promise.all([
     contextoMercado(im.id!),
     getPool()
       .query(
@@ -56,7 +59,16 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
         [im.id]
       )
       .then((r) => r.rows as Atributo[]),
+    getPool()
+      .query(
+        `SELECT atributo, valor, foto_index, foto_url FROM atributos_visuais
+         WHERE imovel_id = $1 ORDER BY atributo`,
+        [im.id]
+      )
+      .then((r) => r.rows as AtributoVisual[]),
   ])
+
+  const sinais = sinaisIncompletos(im, ctx)
 
   const ficha: [string, string][] = [
     ['Preço', brl(im.preco)],
@@ -136,6 +148,10 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
           <CustoReal preco={im.preco} condominio={im.condominio} iptu={im.iptu} />
 
           <Atributos lista={atributos} />
+
+          <AtributosVisuais lista={visuais} />
+
+          <LeveParaVisita sinais={sinais} />
 
           <div
             style={{

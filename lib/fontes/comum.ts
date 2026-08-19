@@ -45,13 +45,19 @@ export function extrairNextData(html: string): Node | null {
   }
 }
 
-/** "R$ 930.000" → 930000. Devolve null para vazio, zero ou lixo. */
+/**
+ * "R$ 930.000" → 930000, "R$ 665.23" → 665.23.
+ *
+ * Usa a mesma regra de desambiguação do ponto que `numeroHumano`: sem ela,
+ * um condomínio de R$ 665,23 virava R$ 66.523 e o custo de dez anos do imóvel
+ * saía multiplicado por cem.
+ */
 export function moeda(v: unknown): number | null {
   if (v == null) return null
   if (typeof v === 'number') return Number.isFinite(v) && v > 0 ? v : null
-  const limpo = String(v).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')
-  const n = Number(limpo)
-  return Number.isFinite(n) && n > 0 ? n : null
+  const limpo = String(v).replace(/[^\d,.-]/g, '')
+  const n = numeroHumano(limpo)
+  return n != null && n > 0 ? n : null
 }
 
 export function numero(v: unknown): number | null {

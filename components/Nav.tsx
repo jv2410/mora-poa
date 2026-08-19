@@ -11,6 +11,7 @@ export default function Nav() {
           <Link href="/chat">Conversar</Link>
           <Link href="/imoveis">Imóveis</Link>
           <Link href="/mercado">Mercado</Link>
+          <Link href="/orcamento">Orçamento</Link>
           <Link href="/dados">De onde vêm os dados</Link>
         </div>
       </nav>

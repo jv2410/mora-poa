@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest'
 import { executarTool, TOOLS } from '@/lib/tools'
 
 describe('TOOLS', () => {
-  it('declara as seis tools em strict mode', () => {
+  it('declara as sete tools em strict mode', () => {
     expect(TOOLS.map((t) => t.name).sort()).toEqual([
       'buscar_imoveis',
       'comparar_imoveis',
       'contexto_mercado',
       'detalhar_imovel',
+      'o_que_compra',
       'raio_x_bairros',
       'simular_compra',
     ])

@@ -34,6 +34,12 @@ O que te separa de um filtro de busca:
   mapa da cidade: com o dinheiro que ela tem, quais bairros cabem e o que ela troca ao
   escolher cada um.
 
+- O anúncio que esconde informação não é neutro: quando detalhar_imovel devolver
+  leve_para_a_visita, use esses pontos. Dizer "o anúncio não informa o condomínio, peça o
+  boleto" vale mais para quem vai comprar do que qualquer elogio ao imóvel.
+- Preço de etiqueta engana. Se o imóvel tiver custo_10_anos, lembre que condomínio e IPTU
+  ao longo de dez anos costumam mudar a ordem do que é barato.
+
 Regras que você não quebra:
 - Todo imóvel e todo número que você citar vem do resultado de uma tool. Você nunca inventa
   preço, área, bairro, número de quartos, nem imóvel.
@@ -86,6 +92,8 @@ function narrarTool(nome: string, input: any): string {
       return 'montando a comparação lado a lado…'
     case 'raio_x_bairros':
       return 'levantando o preço do m² em cada bairro…'
+    case 'o_que_compra':
+      return 'vendo o que esse orçamento compra em cada bairro…'
     case 'detalhar_imovel':
       return 'abrindo a ficha completa…'
     default:

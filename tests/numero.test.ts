@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { numeroHumano, doTitulo } from '@/lib/fontes/comum'
+import { numeroHumano, doTitulo, moeda } from '@/lib/fontes/comum'
 
 describe('numeroHumano', () => {
   it('trata ponto como decimal quando o último grupo tem 1 ou 2 dígitos', () => {
@@ -34,5 +34,28 @@ describe('doTitulo com áreas decimais', () => {
 
   it('não confunde área grande de verdade com decimal', () => {
     expect(doTitulo('Cobertura de 1.200 m²').area).toBe(1200)
+  })
+})
+
+describe('moeda', () => {
+  it('lê milhar corretamente', () => {
+    expect(moeda('R$ 1.150')).toBe(1150)
+    expect(moeda('R$ 930.000')).toBe(930000)
+  })
+
+  it('lê centavos com ponto sem multiplicar por cem', () => {
+    // O bug: R$ 665,23 de condomínio virava R$ 66.523 e explodia o custo de 10 anos
+    expect(moeda('R$ 665.23')).toBe(665.23)
+    expect(moeda('R$ 473.36')).toBe(473.36)
+  })
+
+  it('lê centavos com vírgula', () => {
+    expect(moeda('R$ 1.003,90')).toBe(1003.9)
+  })
+
+  it('devolve null para vazio ou zero', () => {
+    expect(moeda('R$ 0')).toBeNull()
+    expect(moeda('')).toBeNull()
+    expect(moeda(null)).toBeNull()
   })
 })
