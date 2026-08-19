@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest'
 import { executarTool, TOOLS } from '@/lib/tools'
 
 describe('TOOLS', () => {
-  it('declara as três tools em strict mode', () => {
+  it('declara as cinco tools em strict mode', () => {
     expect(TOOLS.map((t) => t.name).sort()).toEqual([
       'buscar_imoveis',
       'comparar_imoveis',
+      'contexto_mercado',
       'detalhar_imovel',
+      'simular_compra',
     ])
     expect(TOOLS.every((t) => t.strict === true)).toBe(true)
     expect(TOOLS.every((t) => t.input_schema.additionalProperties === false)).toBe(true)
@@ -53,6 +55,28 @@ describe('executarTool', () => {
   it('devolve erro legível para id inexistente', async () => {
     const r = await executarTool('detalhar_imovel', { id: 999999 })
     expect(r.erro).toBeTruthy()
+  })
+
+  it('contexto de mercado sempre informa a amostra e a base de comparação', async () => {
+    const { imoveis } = await executarTool('buscar_imoveis', {})
+    const alvo = imoveis.find((i: any) => i.preco_m2 != null)
+    const r = await executarTool('contexto_mercado', { id: alvo.id })
+    expect(r.amostra).toBeGreaterThan(0)
+    expect(r.base_comparacao).toBeTruthy()
+    expect(r.leitura).toBeTruthy()
+    // O percentil tem que ser coerente com o delta contra a mediana
+    if (r.delta_mediana_pct < 0) expect(r.percentil).toBeLessThan(55)
+  })
+
+  it('simulação usa o preço do banco, não o que o modelo mandar', async () => {
+    const { imoveis } = await executarTool('buscar_imoveis', {})
+    const alvo = imoveis[0]
+    const r = await executarTool('simular_compra', {
+      id: alvo.id, entrada: 50000, preco: 999999999, renda_mensal: null,
+      taxa_anual: null, meses: null,
+    })
+    expect(r.simulacao.preco).toBe(Number(alvo.preco))
+    expect(r.simulacao.dinheiro_necessario).toBeGreaterThan(50000)
   })
 
   it('compara imóveis pelos ids', async () => {

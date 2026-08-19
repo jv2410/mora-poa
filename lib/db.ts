@@ -50,6 +50,8 @@ export async function inserirImovel(im: Imovel): Promise<void> {
      im.longitude, im.caracteristicas, im.fotos, im.corretor_nome,
      im.corretor_telefone, im.publicado_em, im.dados_conflitantes]
   )
+  // Toda coleta deixa um ponto na série histórica daquele anúncio.
+  await registrarPreco(im.codigo_origem, im.preco)
 }
 
 /** Converte os NUMERIC do pg (que vêm como string) para number. */
@@ -121,6 +123,19 @@ export async function todos(limite = 100): Promise<Imovel[]> {
     [limite]
   )
   return rows.map(normalizar)
+}
+
+/**
+ * Grava o preço visto hoje. O valor deste dado é função do tempo: em algumas
+ * semanas ele responde "está há 90 dias no mercado e já caiu 4%", que é o
+ * termômetro de urgência do vendedor que todo comprador queria ter.
+ */
+export async function registrarPreco(codigo_origem: string, preco: number): Promise<void> {
+  await getPool().query(
+    `INSERT INTO historico_precos (codigo_origem, preco)
+     VALUES ($1, $2) ON CONFLICT (codigo_origem, visto_em) DO NOTHING`,
+    [codigo_origem, preco]
+  )
 }
 
 /** Quantos imóveis distintos existem, já descontadas as duplicatas. */

@@ -48,3 +48,28 @@ ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS latitude NUMERIC(10,7);
 ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS longitude NUMERIC(10,7);
 ALTER TABLE imoveis ADD COLUMN IF NOT EXISTS caracteristicas TEXT[];
 CREATE INDEX IF NOT EXISTS idx_imoveis_fonte ON imoveis (fonte);
+
+-- Atributos extraídos das descrições em texto livre por um LLM, cada um com a
+-- CITAÇÃO LITERAL que o comprova. A evidência é validada por substring antes
+-- de gravar: se a citação não aparece no texto original, o atributo é
+-- descartado. Isso torna "o modelo não inventa" verificável mecanicamente.
+CREATE TABLE IF NOT EXISTS atributos_extraidos (
+  imovel_id    INT NOT NULL REFERENCES imoveis(id) ON DELETE CASCADE,
+  atributo     TEXT NOT NULL,
+  valor        BOOLEAN NOT NULL,
+  evidencia    TEXT NOT NULL,
+  extraido_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (imovel_id, atributo)
+);
+
+CREATE INDEX IF NOT EXISTS idx_atributos_atributo ON atributos_extraidos (atributo, valor);
+CREATE INDEX IF NOT EXISTS idx_atributos_imovel   ON atributos_extraidos (imovel_id);
+
+-- Histórico de preço: uma linha por anúncio por dia de coleta. O valor deste
+-- dado é função do tempo — quanto antes começar a gravar, antes rende.
+CREATE TABLE IF NOT EXISTS historico_precos (
+  codigo_origem TEXT NOT NULL,
+  preco         NUMERIC(12,2) NOT NULL,
+  visto_em      DATE NOT NULL DEFAULT current_date,
+  UNIQUE (codigo_origem, visto_em)
+);

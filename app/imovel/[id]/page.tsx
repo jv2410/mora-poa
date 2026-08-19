@@ -2,7 +2,11 @@ import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav'
 import AbrirChat from '@/components/AbrirChat'
 import { brl } from '@/components/CardImovel'
-import { porId } from '@/lib/db'
+import { porId, getPool } from '@/lib/db'
+import { contextoMercado } from '@/lib/mercado'
+import FaixaMercado from '@/components/FaixaMercado'
+import Atributos, { type Atributo } from '@/components/Atributos'
+import CustoReal from '@/components/CustoReal'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +15,17 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
   const { id } = await props.params
   const im = await porId(Number(id))
   if (!im) notFound()
+
+  const [ctx, atributos] = await Promise.all([
+    contextoMercado(im.id!),
+    getPool()
+      .query(
+        `SELECT atributo, valor, evidencia FROM atributos_extraidos
+         WHERE imovel_id = $1 ORDER BY valor DESC, atributo`,
+        [im.id]
+      )
+      .then((r) => r.rows as Atributo[]),
+  ])
 
   const ficha: [string, string][] = [
     ['Preço', brl(im.preco)],
@@ -83,6 +98,12 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
               </p>
             </div>
           ) : null}
+
+          {ctx ? <FaixaMercado ctx={ctx} /> : null}
+
+          <CustoReal preco={im.preco} condominio={im.condominio} iptu={im.iptu} />
+
+          <Atributos lista={atributos} />
 
           <div
             style={{

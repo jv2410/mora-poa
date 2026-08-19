@@ -1,6 +1,8 @@
 import { buscar, porId, porIds } from './db'
 import { ranquear, scoreImovel } from './score'
 import type { Criterios } from './tipos'
+import { contextoMercado } from './mercado'
+import { simularCompra } from './financiamento'
 
 export const TOOLS = [
   {
@@ -62,6 +64,46 @@ export const TOOLS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'contexto_mercado',
+    description:
+      'Diz se o preço de um imóvel está caro ou barato comparado aos imóveis ' +
+      'semelhantes do banco: devolve mediana, quartis e o percentil do preço ' +
+      'por m² entre os comparáveis, junto do tamanho da amostra. Use sempre que ' +
+      'a pessoa perguntar se vale a pena, se está caro, ou quando você quiser ' +
+      'sustentar que um imóvel é oportunidade. Cite o tamanho da amostra: uma ' +
+      'mediana de 3 anúncios não sustenta conclusão.',
+    strict: true,
+    input_schema: {
+      type: 'object',
+      properties: { id: { type: 'integer' } },
+      required: ['id'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'simular_compra',
+    description:
+      'Calcula quanto custa de verdade comprar o imóvel: ITBI, escritura, ' +
+      'registro, quanto dinheiro a pessoa precisa ter no dia da assinatura, ' +
+      'parcela SAC e Price, e o custo mensal de moradia com condomínio e IPTU. ' +
+      'Use quando a pessoa falar de entrada, financiamento, parcela ou renda. ' +
+      'Os custos de fechamento surpreendem quase todo comprador de primeira ' +
+      'viagem — vale mencionar mesmo sem ser perguntado.',
+    strict: true,
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        entrada: { type: 'number', description: 'Entrada em reais' },
+        renda_mensal: { type: ['number', 'null'], description: 'Renda mensal familiar' },
+        taxa_anual: { type: ['number', 'null'], description: 'Juros ao ano, ex 0.1149' },
+        meses: { type: ['integer', 'null'], description: 'Prazo, padrão 360' },
+      },
+      required: ['id', 'entrada', 'renda_mensal', 'taxa_anual', 'meses'],
+      additionalProperties: false,
+    },
+  },
 ] as const
 
 /**
@@ -97,6 +139,28 @@ export async function executarTool(nome: string, input: any): Promise<any> {
       const imoveis = await porIds(ids.slice(0, 4))
       return { imoveis: imoveis.map((i) => scoreImovel(i, {})) }
     }
+    case 'contexto_mercado': {
+      const ctx = await contextoMercado(Number(input.id))
+      return ctx ?? { erro: 'Sem preço por m² para comparar este imóvel.' }
+    }
+
+    case 'simular_compra': {
+      const im = await porId(Number(input.id))
+      if (!im) return { erro: `Nenhum imóvel com id ${input.id}.` }
+
+      // O preço vem SEMPRE do banco, nunca do que o modelo mandou.
+      const s = simularCompra({
+        preco: im.preco,
+        entrada: Number(input.entrada) || 0,
+        taxaAnual: input.taxa_anual ?? undefined,
+        meses: input.meses ?? undefined,
+        rendaMensal: input.renda_mensal ?? undefined,
+        condominio: im.condominio,
+        iptu: im.iptu,
+      })
+      return { imovel: { id: im.id, titulo: im.titulo, bairro: im.bairro }, simulacao: s }
+    }
+
     default:
       return { erro: `Tool desconhecida: ${nome}` }
   }
