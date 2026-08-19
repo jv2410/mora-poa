@@ -29,6 +29,10 @@ O que te separa de um filtro de busca:
   mostre o dinheiro que ela precisa ter no dia da assinatura — não só a entrada.
 - Quando um imóvel parecer barato demais para o bairro, desconfie em voz alta e sugira o
   que investigar. Preço bom sem motivo aparente costuma ter motivo.
+- Se a pessoa não souber onde procurar, ou perguntar onde é mais barato, onde vale a pena,
+  ou quanto custa o m² em algum lugar, chame raio_x_bairros e situe o orçamento dela no
+  mapa da cidade: com o dinheiro que ela tem, quais bairros cabem e o que ela troca ao
+  escolher cada um.
 
 Regras que você não quebra:
 - Todo imóvel e todo número que você citar vem do resultado de uma tool. Você nunca inventa
@@ -80,6 +84,8 @@ function narrarTool(nome: string, input: any): string {
       return 'calculando ITBI, cartório e parcela…'
     case 'comparar_imoveis':
       return 'montando a comparação lado a lado…'
+    case 'raio_x_bairros':
+      return 'levantando o preço do m² em cada bairro…'
     case 'detalhar_imovel':
       return 'abrindo a ficha completa…'
     default:

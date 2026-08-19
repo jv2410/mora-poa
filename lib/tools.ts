@@ -3,6 +3,7 @@ import { ranquear, scoreImovel } from './score'
 import type { Criterios } from './tipos'
 import { contextoMercado } from './mercado'
 import { simularCompra } from './financiamento'
+import { raioX } from './raioX'
 
 export const TOOLS = [
   {
@@ -82,6 +83,28 @@ export const TOOLS = [
     },
   },
   {
+    name: 'raio_x_bairros',
+    description:
+      'Devolve o ranking de bairros de Porto Alegre por preço do m², com ' +
+      'mediana, quartis, preço e área medianos e o tamanho da amostra de cada ' +
+      'um. Use quando a pessoa perguntar onde é mais barato, onde vale mais a ' +
+      'pena, quanto custa o m² num bairro, ou quando ela não souber em que ' +
+      'bairro procurar. Também serve para situar o orçamento dela: com X reais ' +
+      'e Y m² desejados, quais bairros cabem.',
+    strict: true,
+    input_schema: {
+      type: 'object',
+      properties: {
+        dorm: {
+          type: ['integer', 'null'],
+          description: 'Filtra o ranking por número de dormitórios, se relevante',
+        },
+      },
+      required: ['dorm'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'simular_compra',
     description:
       'Calcula quanto custa de verdade comprar o imóvel: ITBI, escritura, ' +
@@ -139,6 +162,19 @@ export async function executarTool(nome: string, input: any): Promise<any> {
       const imoveis = await porIds(ids.slice(0, 4))
       return { imoveis: imoveis.map((i) => scoreImovel(i, {})) }
     }
+    case 'raio_x_bairros': {
+      const x = await raioX(input?.dorm ?? null)
+      return {
+        mediana_poa: x.geral.mediana,
+        total_analisado: x.geral.n,
+        filtro_dormitorios: x.dormFiltro,
+        mais_caro: x.maisCaro,
+        mais_barato: x.maisBarato,
+        razao_caro_barato: x.razao,
+        bairros: x.bairros,
+      }
+    }
+
     case 'contexto_mercado': {
       const ctx = await contextoMercado(Number(input.id))
       return ctx ?? { erro: 'Sem preço por m² para comparar este imóvel.' }

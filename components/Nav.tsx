@@ -10,6 +10,7 @@ export default function Nav() {
         <div className="nav-links">
           <Link href="/chat">Conversar</Link>
           <Link href="/imoveis">Imóveis</Link>
+          <Link href="/mercado">Mercado</Link>
           <Link href="/dados">De onde vêm os dados</Link>
         </div>
       </nav>

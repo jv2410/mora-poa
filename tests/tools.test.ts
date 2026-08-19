@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest'
 import { executarTool, TOOLS } from '@/lib/tools'
 
 describe('TOOLS', () => {
-  it('declara as cinco tools em strict mode', () => {
+  it('declara as seis tools em strict mode', () => {
     expect(TOOLS.map((t) => t.name).sort()).toEqual([
       'buscar_imoveis',
       'comparar_imoveis',
       'contexto_mercado',
       'detalhar_imovel',
+      'raio_x_bairros',
       'simular_compra',
     ])
     expect(TOOLS.every((t) => t.strict === true)).toBe(true)
@@ -77,6 +78,25 @@ describe('executarTool', () => {
     })
     expect(r.simulacao.preco).toBe(Number(alvo.preco))
     expect(r.simulacao.dinheiro_necessario).toBeGreaterThan(50000)
+  })
+
+  it('raio-x devolve ranking com amostra e nunca mediana absurda', async () => {
+    const r = await executarTool('raio_x_bairros', { dorm: null })
+    expect(r.bairros.length).toBeGreaterThan(5)
+    expect(r.mediana_poa).toBeGreaterThan(2000)
+    expect(r.razao_caro_barato).toBeGreaterThan(1)
+    for (const b of r.bairros) {
+      expect(b.n).toBeGreaterThanOrEqual(5)
+      // a faixa de sanidade tem que estar valendo
+      expect(b.mediana).toBeGreaterThan(1500)
+      expect(b.mediana).toBeLessThan(40000)
+      expect(b.p25).toBeLessThanOrEqual(b.mediana)
+      expect(b.mediana).toBeLessThanOrEqual(b.p75)
+    }
+    // ordenado do mais caro para o mais barato
+    for (let i = 1; i < r.bairros.length; i++) {
+      expect(r.bairros[i - 1].mediana).toBeGreaterThanOrEqual(r.bairros[i].mediana)
+    }
   })
 
   it('compara imóveis pelos ids', async () => {

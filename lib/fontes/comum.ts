@@ -77,12 +77,44 @@ export function normalizarBairro(s: string): string {
     .join(' ')
 }
 
+/**
+ * Converte um número escrito por humano em pt-BR ou en-US.
+ *
+ * O ponto é ambíguo: em "1.234" ele separa milhar, em "113.75" ele é decimal.
+ * Os portais misturam as duas convenções no mesmo campo — a Foxter escreve
+ * "113.75 m²" enquanto outros escrevem "1.200 m²". Tratar todo ponto como
+ * milhar transformava 113,75 m² num apartamento de 11.375 m², o que por sua
+ * vez destruía o preço por m² e, com ele, qualquer comparação de mercado.
+ *
+ * Regra: se houver vírgula, ela é o decimal e o ponto é milhar. Se só houver
+ * ponto e o último grupo tiver 1 ou 2 dígitos, esse ponto é decimal.
+ */
+export function numeroHumano(s: string): number | null {
+  const bruto = s.trim()
+  if (!bruto) return null
+
+  let normalizado: string
+  if (bruto.includes(',')) {
+    normalizado = bruto.replace(/\./g, '').replace(',', '.')
+  } else {
+    const grupos = bruto.split('.')
+    const ultimo = grupos[grupos.length - 1]
+    normalizado =
+      grupos.length > 1 && ultimo.length <= 2
+        ? grupos.slice(0, -1).join('') + '.' + ultimo
+        : grupos.join('')
+  }
+
+  const n = Number(normalizado)
+  return Number.isFinite(n) ? n : null
+}
+
 /** Extrai dormitórios e área privativa de um título de anúncio. */
 export function doTitulo(titulo: string): { dorm: number | null; area: number | null } {
   const mDorm = titulo.match(/(\d+)\s*(?:quartos?|dormit[óo]rios?|dorms?)/i)
   const mArea = titulo.match(/([\d.,]+)\s*m[²2]/i)
   return {
     dorm: mDorm ? Number(mDorm[1]) : null,
-    area: mArea ? Number(mArea[1].replace(/\./g, '').replace(',', '.')) : null,
+    area: mArea ? numeroHumano(mArea[1]) : null,
   }
 }
