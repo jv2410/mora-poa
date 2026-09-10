@@ -3,7 +3,7 @@ import '@/styles/system.css'
 import ChatPanel from '@/components/ChatPanel'
 
 export const metadata: Metadata = {
-  title: 'mora.ai — encontre seu apê em Porto Alegre conversando',
+  title: 'MORA.AI — o estoque da cidade cruzado com o briefing do seu cliente',
   description:
     'Descreva o que você procura em português. A IA busca no banco, ranqueia e explica por que cada imóvel serve para você.',
 }

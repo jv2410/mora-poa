@@ -61,7 +61,7 @@ export default function FaixaMercado({ ctx }: { ctx: ContextoMercado }) {
             width: `${pos(ctx.p75) - pos(ctx.p25)}%`,
             height: 4,
             borderRadius: 2,
-            background: 'rgba(255,255,255,.22)',
+            background: 'var(--line)',
           }}
         />
         {/* mediana */}

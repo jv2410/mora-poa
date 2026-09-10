@@ -5,10 +5,10 @@ export default function Nav() {
     <div className="wrap">
       <nav className="nav">
         <Link href="/" className="marca">
-          mora<span>.ai</span>
+          MORA<span>.AI</span>
         </Link>
         <div className="nav-links">
-          <Link href="/chat">Conversar</Link>
+          <Link href="/chat">Briefing</Link>
           <Link href="/imoveis">Imóveis</Link>
           <Link href="/mercado">Mercado</Link>
           <Link href="/orcamento">Orçamento</Link>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import HeroSpot from '@/components/HeroSpot'
-import BuscaHero from '@/components/BuscaHero'
+import Briefing from '@/components/Briefing'
 import CardImovel from '@/components/CardImovel'
 import { todos, getPool } from '@/lib/db'
 
@@ -25,44 +25,53 @@ async function estatisticas() {
   }
 }
 
-/**
- * Chips com número de verdade, não frase genérica. Um chip que já carrega um
- * dado do banco comunica em três segundos que isto não é um chatbot qualquer.
- */
-async function chipsComDado(): Promise<string[]> {
-  const { rows } = await getPool().query(`
-    SELECT bairro, count(*)::int n, round(percentile_cont(0.5)
-             WITHIN GROUP (ORDER BY preco))::int mediana
-    FROM imoveis
-    WHERE dormitorios >= 2 AND preco IS NOT NULL
-    GROUP BY bairro HAVING count(*) >= 12
-    ORDER BY mediana ASC LIMIT 3
-  `)
-  return rows.map(
-    (r) => `2 quartos no ${r.bairro} · ${r.n} opções, mediana ${Math.round(r.mediana / 1000)} mil`
-  )
-}
-
 const PASSOS = [
   {
     n: '01',
-    t: 'Você fala',
-    d: 'Do jeito que você pensa: "dois quartos até 600 mil, perto da Redenção, e eu tenho cachorro". Sem formulário, sem checkbox.',
+    t: 'Você cola o briefing',
+    d: 'Do jeito que o cliente falou, com contradição e tudo: "teto de 750 mas se for muito bom estica até 800". Sem formulário, sem 18 campos.',
   },
   {
     n: '02',
-    t: 'A IA busca e compara',
-    d: 'Ela traduz o que você disse em critérios, consulta o banco e compara cada imóvel com os semelhantes do mesmo bairro. Você vê a busca acontecendo.',
+    t: 'A MORA cruza com o estoque',
+    d: 'O anúncio de seis portais num banco só, sem o mesmo apartamento repetido três vezes, e cada imóvel comparado com os semelhantes do próprio bairro.',
   },
   {
     n: '03',
-    t: 'Você entende o porquê',
-    d: 'Nota de match, o que bate e o que não bate, onde o preço cai na distribuição do bairro, e quanto custa de verdade fechar — com ITBI e cartório.',
+    t: 'Você recebe o que apresentar',
+    d: 'Separado entre o que atende tudo e o que vale apresentar com ressalva — e a ressalva vem escrita, para você falar antes que o cliente descubra.',
+  },
+]
+
+/**
+ * As três faixas são a assinatura do produto, então aparecem na home com a
+ * cara que têm no resultado — não descritas em prosa. Quem é corretor
+ * reconhece o problema na hora: ele já mandou lista para cliente sem saber
+ * qual imóvel tinha o defeito.
+ */
+const FAIXAS = [
+  {
+    cor: 'var(--alta)',
+    fundo: 'var(--alta-fundo)',
+    titulo: 'Alta compatibilidade',
+    d: 'Atende todos os critérios do briefing. Manda para o cliente sem pensar duas vezes.',
+  },
+  {
+    cor: 'var(--ressalva)',
+    fundo: 'var(--ressalva-fundo)',
+    titulo: 'Vale apresentar',
+    d: '"Atende tudo, exceto o teto de preço — R$ 40 mil acima, mas custo mensal R$ 600 abaixo da mediana dos que batem tudo."',
+  },
+  {
+    cor: 'var(--alerta)',
+    fundo: 'rgba(165, 52, 42, .07)',
+    titulo: 'Não encontrei — e a saída',
+    d: 'Nunca termina em "não encontrei". Se o teto subir para R$ 560 mil aparecem 12; sem a segunda vaga, aparecem 8. Contagem real do banco.',
   },
 ]
 
 export default async function Home() {
-  const [destaques, stats, chips] = await Promise.all([todos(6), estatisticas(), chipsComDado()])
+  const [destaques, stats] = await Promise.all([todos(6), estatisticas()])
 
   return (
     <>
@@ -73,16 +82,17 @@ export default async function Home() {
         <div className="wrap">
           <div className="pill hero-badge">
             <span className="dot" />
-            {stats.total} imóveis · {stats.portais} portais · grátis
+            {stats.total} imóveis · {stats.portais} portais · um banco só
           </div>
           <h1>
-            Descreva o apê. <span className="accent">A IA acha.</span>
+            Cole o briefing. <span className="accent">Receba o que apresentar.</span>
           </h1>
           <p className="sub">
-            Procurar imóvel virou preencher filtro. Aqui você conversa — e recebe a lista
-            já explicada, comparada com o mercado do bairro.
+            O corretor perde a venda procurando imóvel em seis portais enquanto o lead
+            esfria. A MORA.AI cruza o que o seu cliente pediu com o estoque anunciado da
+            cidade e devolve só o que vale mostrar.
           </p>
-          <BuscaHero chips={chips} />
+          <Briefing />
         </div>
       </section>
 
@@ -111,6 +121,31 @@ export default async function Home() {
         </div>
       </div>
 
+      <section className="section-pad" id="faixas">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">O resultado</span>
+            <h2>Nenhum imóvel volta como &ldquo;87% de match&rdquo;.</h2>
+            <p>
+              Porcentagem obriga você a interpretar antes de decidir. A MORA devolve a
+              decisão pronta em três faixas — e quando algo não bate, diz exatamente o quê.
+            </p>
+          </div>
+          <div className="grid-3">
+            {FAIXAS.map((f) => (
+              <div
+                key={f.titulo}
+                className="card"
+                style={{ borderColor: f.cor, background: f.fundo }}
+              >
+                <h3 style={{ color: f.cor, margin: '0 0 12px' }}>{f.titulo}</h3>
+                <p style={{ color: 'var(--muted)', fontSize: 15 }}>{f.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section-pad section-alt" id="como">
         <div className="wrap">
           <div className="section-head">
@@ -133,14 +168,15 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section-pad" id="bairros">
+      <section className="section-pad" id="estoque">
         <div className="wrap">
           <div className="section-head">
             <span className="eyebrow">No banco agora</span>
-            <h2>Os mais acessíveis.</h2>
+            <h2>O estoque, sem repetição.</h2>
             <p>
-              A partir de {(stats.menor / 1000).toFixed(0)} mil. Clique em qualquer um para ver
-              a ficha com faixa de mercado e custo real de compra.
+              A partir de {(stats.menor / 1000).toFixed(0)} mil. O mesmo apartamento
+              anunciado em três portais entra uma vez só — lista com imóvel repetido queima
+              você na frente do cliente.
             </p>
           </div>
           <div className="grid-imoveis">
@@ -158,20 +194,25 @@ export default async function Home() {
 
       <section className="section-pad section-alt">
         <div className="wrap" style={{ textAlign: 'center' }}>
-          <h2 style={{ maxWidth: '16ch', margin: '0 auto 22px' }}>Pronto para achar o seu?</h2>
-          <p style={{ color: 'var(--muted)', maxWidth: 520, margin: '0 auto 38px' }}>
-            Grátis, sem cadastro, sem corretor te ligando depois. A gente não vende imóvel
-            nem ganha comissão de ninguém.
+          <h2 style={{ maxWidth: '20ch', margin: '0 auto 22px' }}>
+            Traga o briefing do seu próximo atendimento.
+          </h2>
+          <p style={{ color: 'var(--muted)', maxWidth: 560, margin: '0 auto 38px' }}>
+            A MORA não vende imóvel, não capta cliente e não fica com comissão. Ela só acha,
+            no que já está anunciado, o que serve para o cliente que é seu.
           </p>
           <Link href="/chat" className="btn btn-solid">
-            Conversar agora
+            Abrir o chat
           </Link>
         </div>
       </section>
 
       <footer>
-        <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
-          <span>mora.ai · Porto Alegre, RS</span>
+        <div
+          className="wrap"
+          style={{ display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}
+        >
+          <span>MORA.AI · Porto Alegre, RS</span>
           <Link href="/dados" style={{ color: 'var(--muted)' }}>
             de onde vêm os dados →
           </Link>

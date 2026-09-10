@@ -8,7 +8,7 @@ const base: Imovel = {
   preco: 500000, condominio: 800, iptu: 1200, area: 80, area_total: 110,
   dormitorios: 2, suites: 1, banheiros: 2, vagas: 1,
   bairro: 'Menino Deus', endereco: null, cidade: 'Porto Alegre',
-  fotos: [], corretor_nome: null, corretor_telefone: null,
+  fotos: [],
   publicado_em: null, dados_conflitantes: false, custo_mensal: 900,
 }
 

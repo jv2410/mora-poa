@@ -60,7 +60,7 @@ export default function AtributosVisuais({ lista }: { lista: AtributoVisual[] })
               className="chip-visual"
               style={{
                 borderColor: alerta ? 'rgba(255,180,0,.35)' : 'var(--green-dim)',
-                background: alerta ? 'rgba(255,180,0,.07)' : 'rgba(0,232,122,.05)',
+                background: alerta ? 'var(--ressalva-fundo)' : 'var(--alta-fundo)',
                 color: alerta ? '#ffc75a' : 'var(--ink)',
               }}
             >

@@ -38,11 +38,36 @@ export default function CardImovel({ im }: Props) {
         <div className="foto-vazia">{im.bairro ?? 'sem foto'}</div>
       )}
 
-      {im.score != null ? (
-        <div className="pill" style={{ marginBottom: 12 }}>
-          <span className="dot" />
-          {im.score}% de match
+      {/*
+        A faixa substitui o "% de match". Porcentagem é um número que o
+        corretor tem que interpretar antes de agir; a faixa já é a ação, e a
+        ressalva logo abaixo é o que ele fala ao cliente.
+      */}
+      {im.faixa ? (
+        <div
+          className="pill"
+          style={{
+            marginBottom: 10,
+            color: im.faixa === 'alta' ? 'var(--alta)' : 'var(--ressalva)',
+            borderColor: im.faixa === 'alta' ? 'var(--alta)' : 'var(--ressalva)',
+            background: im.faixa === 'alta' ? 'var(--alta-fundo)' : 'var(--ressalva-fundo)',
+          }}
+        >
+          <span
+            className="dot"
+            style={{
+              background: im.faixa === 'alta' ? 'var(--alta)' : 'var(--ressalva)',
+              boxShadow: 'none',
+            }}
+          />
+          {im.faixa === 'alta' ? 'Alta compatibilidade' : 'Vale apresentar'}
         </div>
+      ) : null}
+
+      {im.ressalva ? (
+        <p style={{ fontSize: 13, color: 'var(--ressalva)', marginBottom: 12, lineHeight: 1.45 }}>
+          {im.ressalva}
+        </p>
       ) : null}
 
       <h3 style={{ marginBottom: 8 }}>{brl(im.preco)}</h3>

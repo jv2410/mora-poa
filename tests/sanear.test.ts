@@ -7,7 +7,7 @@ const base: Imovel = {
   preco: 420000, condominio: 500, iptu: 1200, area: 80, area_total: null,
   dormitorios: 2, suites: null, banheiros: 1, vagas: 1, bairro: 'Bom Fim',
   endereco: null, cidade: 'Porto Alegre', latitude: null, longitude: null,
-  caracteristicas: [], fotos: [], corretor_nome: null, corretor_telefone: null,
+  caracteristicas: [], fotos: [],
   publicado_em: null, dados_conflitantes: false,
 }
 

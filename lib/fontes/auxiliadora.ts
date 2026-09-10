@@ -97,8 +97,6 @@ export function parsearImovel(html: string, url: string): Imovel | null {
     longitude: null,
     caracteristicas: [],
     fotos,
-    corretor_nome: primeiro(listing.provider).name ?? null,
-    corretor_telefone: primeiro(listing.provider).telephone ?? null,
     publicado_em: listing.datePosted ?? null,
     dados_conflitantes,
   }

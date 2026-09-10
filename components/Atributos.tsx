@@ -46,7 +46,7 @@ export default function Atributos({ lista }: { lista: Atributo[] }) {
               padding: '7px 14px',
               borderRadius: 999,
               border: `1px solid ${a.valor ? 'var(--green-dim)' : 'var(--line)'}`,
-              background: a.valor ? 'rgba(0,232,122,.05)' : 'rgba(255,255,255,.02)',
+              background: a.valor ? 'var(--alta-fundo)' : 'var(--elev)',
               fontSize: 13.5,
               color: a.valor ? 'var(--ink)' : 'var(--muted-2)',
               cursor: 'help',

@@ -77,8 +77,6 @@ export function parsearImovel(html: string, url: string): Imovel | null {
     longitude: numero(im.longitude),
     caracteristicas,
     fotos,
-    corretor_nome: 'Guarida Imóveis',
-    corretor_telefone: null,
     publicado_em: null,
     dados_conflitantes: false,
   }

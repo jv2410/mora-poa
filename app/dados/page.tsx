@@ -6,7 +6,7 @@ import { haQuantoTempo } from '@/lib/formato'
 export const revalidate = 3600
 
 export const metadata = {
-  title: 'De onde vêm os dados — mora.ai',
+  title: 'De onde vêm os dados — MORA.AI',
   description:
     'Seis portais, coleta datada, deduplicação entre fontes e citação literal em cada atributo. Não vendemos imóvel e não recebemos comissão.',
 }
@@ -47,18 +47,18 @@ export default async function Dados() {
           <h2 style={{ margin: '20px 0 18px' }}>De onde vêm os dados.</h2>
           <p style={{ color: 'var(--muted)', fontSize: 18, lineHeight: 1.6, marginBottom: 48 }}>
             Você está prestes a tomar uma das maiores decisões financeiras da sua vida com
-            ajuda de um site que não conhece. É justo que você saiba exatamente o que está
-            por trás de cada número aqui.
+            ajuda de um site que não conhece. Você vai levar estes números para a frente de
+            um cliente, então é justo que saiba exatamente o que está por trás de cada um.
           </p>
 
           <div className="card" style={{ marginBottom: 40, borderColor: 'var(--green-dim)' }}>
             <h3 style={{ marginBottom: 12 }}>Não vendemos imóvel.</h3>
             <p style={{ color: 'var(--muted)', fontSize: 15.5, lineHeight: 1.7 }}>
-              Não somos imobiliária, não temos corretor, não recebemos comissão de ninguém e
-              não somos pagos pelos portais que aparecem aqui. O botão “ver anúncio original”
-              te manda direto para quem está vendendo. Não temos motivo para te empurrar um
-              imóvel em vez de outro — e é por isso que a ordem da lista é um cálculo, não uma
-              negociação comercial.
+              Não somos imobiliária, não captamos, não recebemos comissão de ninguém e não
+              somos pagos pelos portais que aparecem aqui. Não competimos com você: o cliente
+              é seu, a venda é sua. O botão “ver anúncio original” manda direto para quem
+              captou o imóvel. Como não ganhamos nada por indicar um em vez de outro, a ordem
+              da lista é um cálculo — não uma negociação comercial.
             </p>
           </div>
 

@@ -27,7 +27,7 @@ const brlMeta = (n: number) =>
 export async function generateMetadata(props: PageProps<'/imovel/[id]'>) {
   const { id } = await props.params
   const im = await porId(Number(id))
-  if (!im) return { title: 'Imóvel não encontrado — mora.ai' }
+  if (!im) return { title: 'Imóvel não encontrado — MORA.AI' }
 
   const titulo = `${brlMeta(im.preco)} · ${im.dormitorios ?? '?'} dorm · ${im.bairro}`
   const partes = [
@@ -37,7 +37,7 @@ export async function generateMetadata(props: PageProps<'/imovel/[id]'>) {
   ].filter(Boolean)
 
   return {
-    title: `${titulo} — mora.ai`,
+    title: `${titulo} — MORA.AI`,
     description: partes.join(' · '),
     openGraph: { title: titulo, description: partes.join(' · '), type: 'article' },
   }
@@ -206,12 +206,16 @@ export default async function Detalhe(props: PageProps<'/imovel/[id]'>) {
             </a>
           </div>
 
-          {im.corretor_nome ? (
-            <p style={{ color: 'var(--muted-2)', fontSize: 13.5, marginTop: 28 }}>
-              Anunciado por {im.corretor_nome}
-              {im.corretor_telefone ? ` · ${im.corretor_telefone}` : ''}
-            </p>
-          ) : null}
+          {/*
+            Contato mora no anúncio de origem, nunca aqui. O corretor que usa a
+            MORA precisa chegar ao anunciante — e chega, por link. O que não
+            fazemos é republicar nome e telefone de terceiro na nossa página.
+          */}
+          <p style={{ color: 'var(--muted-2)', fontSize: 13.5, marginTop: 28 }}>
+            Anunciado em {im.fonte}. Nome e telefone do anunciante não são
+            republicados aqui — abra o anúncio original para falar com quem
+            captou.
+          </p>
         </div>
       </section>
     </>

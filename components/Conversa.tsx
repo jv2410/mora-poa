@@ -36,7 +36,7 @@ export function ColunaConversa({
           <div
             style={{
               border: '1px solid var(--green-dim)',
-              background: 'rgba(0,232,122,.05)',
+              background: 'var(--alta-fundo)',
               borderRadius: 14,
               padding: '12px 16px',
               marginBottom: 20,
@@ -83,7 +83,7 @@ export function ColunaConversa({
                   padding: '13px 16px',
                   borderRadius: 12,
                   border: '1px solid var(--line)',
-                  background: 'rgba(255,255,255,.02)',
+                  background: 'var(--elev)',
                   color: 'var(--muted)',
                   fontFamily: 'var(--sans)',
                   fontSize: 14.5,
@@ -146,7 +146,7 @@ export function ColunaConversa({
             padding: '13px 18px',
             borderRadius: 999,
             border: '1px solid var(--line)',
-            background: 'rgba(255,255,255,.02)',
+            background: 'var(--elev)',
             color: 'var(--ink)',
             fontFamily: 'var(--sans)',
             // 16px evita o zoom automático do iOS ao focar o campo
@@ -216,7 +216,7 @@ function Bolha({ role, texto }: { role: 'user' | 'assistant'; texto: string }) {
         marginBottom: 18,
         padding: eu ? '11px 15px' : 0,
         borderRadius: 14,
-        background: eu ? 'rgba(0,232,122,.08)' : 'transparent',
+        background: eu ? 'var(--alta-fundo)' : 'transparent',
         border: eu ? '1px solid var(--green-dim)' : 'none',
         marginLeft: eu ? 32 : 0,
       }}

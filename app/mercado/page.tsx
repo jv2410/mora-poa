@@ -7,7 +7,7 @@ import { brl } from '@/lib/formato'
 export const revalidate = 3600
 
 export const metadata = {
-  title: 'Quanto custa o m² em cada bairro de Porto Alegre — mora.ai',
+  title: 'Quanto custa o m² em cada bairro de Porto Alegre — MORA.AI',
   description:
     'Mediana e faixa de preço por metro quadrado em cada bairro de POA, calculadas sobre anúncios reais de seis portais. Grátis e sem cadastro.',
 }
@@ -178,7 +178,7 @@ export default async function Mercado(props: PageProps<'/mercado'>) {
 
       <footer>
         <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
-          <span>mora.ai · Porto Alegre, RS</span>
+          <span>MORA.AI · Porto Alegre, RS</span>
           <Link href="/dados" style={{ color: 'var(--muted)' }}>
             de onde vêm os dados →
           </Link>

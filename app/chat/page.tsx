@@ -20,7 +20,7 @@ function ChatInterno() {
     <div className="chat-cheio">
       <header className="chat-cheio-topo">
         <Link href="/" className="marca">
-          mora<span>.ai</span>
+          MORA<span>.AI</span>
         </Link>
         <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
           <Link href="/imoveis" className="tag">

@@ -71,8 +71,6 @@ export function parsearImovel(html: string, url: string): Imovel | null {
     longitude: null,
     caracteristicas: [],
     fotos,
-    corretor_nome: 'Foxter Cia Imobiliária',
-    corretor_telefone: '+555130837777',
     publicado_em: null,
     dados_conflitantes: false,
   }

@@ -52,9 +52,15 @@ describe('parsearImovel', () => {
     expect(im.fotos[0]).toContain('/thumb/1920/')
   })
 
-  it('extrai o corretor', () => {
-    expect(im.corretor_nome).toBe('Lilian Matoso')
-    expect(im.corretor_telefone).toBe('555132166184')
+  // O fixture desta página traz `provider.name` e `provider.telephone` no
+  // JSON-LD. O parser vê e descarta: a MORA não republica contato de
+  // anunciante, então o dado não chega nem a existir no objeto. Ver
+  // tests/lgpd.test.ts.
+  it('não extrai contato do anunciante, mesmo quando a fonte publica', () => {
+    expect(im).not.toHaveProperty('corretor_nome')
+    expect(im).not.toHaveProperty('corretor_telefone')
+    expect(JSON.stringify(im)).not.toContain('Lilian Matoso')
+    expect(JSON.stringify(im)).not.toContain('555132166184')
   })
 
   it('devolve null para HTML sem JSON-LD de imóvel', () => {

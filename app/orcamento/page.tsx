@@ -6,7 +6,7 @@ import { brl } from '@/lib/formato'
 export const revalidate = 3600
 
 export const metadata = {
-  title: 'O que o seu dinheiro compra em cada bairro de Porto Alegre — mora.ai',
+  title: 'O que cabe no orçamento do cliente em cada bairro de Porto Alegre — MORA.AI',
   description:
     'Escolha um orçamento e veja o apartamento mediano que ele compra em cada bairro de POA. Imóveis reais, de seis portais.',
 }
@@ -42,7 +42,7 @@ export default async function Orcamento(props: PageProps<'/orcamento'>) {
           </h2>
           <p style={{ color: 'var(--muted)', fontSize: 18, maxWidth: 640, lineHeight: 1.6 }}>
             Não é simulação: cada linha abaixo é o apartamento mediano que esse dinheiro
-            compra naquele bairro hoje — o que você realmente encontra procurando ali.
+            compra naquele bairro hoje — o que o cliente realmente encontra procurando ali.
           </p>
         </div>
       </section>
@@ -82,7 +82,7 @@ export default async function Orcamento(props: PageProps<'/orcamento'>) {
           <div className="wrap">
             <div className="card" style={{ borderColor: 'var(--green-dim)', padding: '30px 28px' }}>
               <p style={{ fontSize: 'clamp(18px, 2.6vw, 25px)', lineHeight: 1.45, maxWidth: 800 }}>
-                Com {brl(valor)} você compra{' '}
+                Com {brl(valor)} o cliente compra{' '}
                 <strong style={{ color: 'var(--green)' }}>{r.melhor_area.area} m²</strong> no{' '}
                 {r.melhor_area.bairro} — ou{' '}
                 <strong>{r.pior_area.area} m²</strong> no {r.pior_area.bairro}. O mesmo dinheiro,{' '}

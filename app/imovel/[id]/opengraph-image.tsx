@@ -4,7 +4,7 @@ import { contextoMercado } from '@/lib/mercado'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
-export const alt = 'Imóvel no mora.ai'
+export const alt = 'Imóvel na MORA.AI'
 
 const brl = (n: number) =>
   Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
@@ -35,7 +35,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             fontSize: 48,
           }}
         >
-          mora.ai
+          MORA.AI
         </div>
       ),
       size
@@ -120,7 +120,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               display: 'flex',
             }}
           >
-            mora.ai
+            MORA.AI
           </div>
         </div>
       </div>

@@ -102,8 +102,6 @@ export function paraImovel(c: CardBruto, fonte: string): Imovel | null {
     longitude: null,
     caracteristicas: [],
     fotos: c.foto ? [c.foto] : [],
-    corretor_nome: null,
-    corretor_telefone: null,
     publicado_em: null,
     dados_conflitantes: false,
   }

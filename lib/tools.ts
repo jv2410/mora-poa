@@ -6,14 +6,19 @@ import { simularCompra, custoOportunidade } from './financiamento'
 import { raioX } from './raioX'
 import { oQueCompra } from './orcamento'
 import { sinaisIncompletos, notaCompletude } from './completude'
+import { alternativas } from './alternativas'
 
 export const TOOLS = [
   {
     name: 'buscar_imoveis',
     description:
       'Busca apartamentos à venda em Porto Alegre no banco e devolve até 20 ranqueados ' +
-      'por aderência aos critérios, cada um com score de 0 a 100 e as listas "atende" e ' +
-      '"nao_atende" já calculadas. Chame assim que tiver ao menos um critério concreto — ' +
+      'por aderência aos critérios. Cada imóvel vem com "faixa": "alta" (atende todos os ' +
+      'critérios informados) ou "ressalva" (atende quase tudo, e o campo "ressalva" diz ' +
+      'exatamente o que furou). Quando nenhum imóvel é de alta compatibilidade, o campo ' +
+      '"alternativas" traz contagens reais do banco de quantos imóveis apareceriam ' +
+      'afrouxando cada critério — use isso em vez de dizer só "não encontrei". ' +
+      'Chame assim que tiver ao menos um critério concreto — ' +
       'não espere ter todos. Informe apenas os critérios que a pessoa realmente mencionou: ' +
       'critério não informado não penaliza nenhum imóvel. Bairros disponíveis no banco: ' +
       "Moinhos de Vento, Petrópolis, Bela Vista, Bom Fim, Santana, Cidade Baixa, Jardim Europa, Menino Deus, Auxiliadora, Humaitá, Vila Nova, Morro Santana, Cavalhada, Centro Histórico, Rubem Berta, Passo da Areia, Santa Tereza, Farrapos, Cristal, Partenon, Sarandi, Tristeza e outros.",
@@ -47,7 +52,8 @@ export const TOOLS = [
     name: 'detalhar_imovel',
     description:
       'Devolve a ficha completa de um imóvel pelo id, incluindo descrição, ' +
-      'fotos, área total e dados do corretor.',
+      'fotos, área total e o link do anúncio original. Não devolve nome nem ' +
+      'telefone de corretor ou proprietário — esse contato só existe na fonte.',
     strict: true,
     input_schema: {
       type: 'object',
@@ -169,8 +175,23 @@ export async function executarTool(nome: string, input: any): Promise<any> {
       // Busca uma margem maior no SQL e deixa o ranking decidir o corte —
       // um imóvel que estoura o teto em 3% pode ser a melhor opção da lista.
       const encontrados = await buscar(afrouxar(c), 60)
-      const imoveis = ranquear(encontrados, c).slice(0, 20)
-      return { total: imoveis.length, criterios_aplicados: c, imoveis }
+      const todosRanqueados = ranquear(encontrados, c)
+
+      // "fora" não vai para o corretor: são imóveis que furaram três critérios
+      // ou mais, e mandar isso ao cliente queima a credibilidade dele.
+      const imoveis = todosRanqueados.filter((i) => i.faixa !== 'fora').slice(0, 20)
+      const alta = imoveis.filter((i) => i.faixa === 'alta')
+      const ressalva = imoveis.filter((i) => i.faixa === 'ressalva')
+
+      return {
+        criterios_aplicados: c,
+        alta_compatibilidade: alta.length,
+        vale_apresentar: ressalva.length,
+        // Sem nada de alta compatibilidade, o valor da resposta passa a ser a
+        // saída, não a lista. Só então gastamos as queries do contrafactual.
+        alternativas: alta.length === 0 ? await alternativas(c) : null,
+        imoveis,
+      }
     }
     case 'detalhar_imovel': {
       const im = await porId(Number(input.id))
