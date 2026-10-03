@@ -56,6 +56,38 @@ const ORDEM_QUALIDADE = `
 
 let pool: Pool | null = null
 
+/**
+ * TLS é decidido pelo destino, não pelo nome do provedor.
+ *
+ * A versão anterior ligava SSL só quando a URL continha "supabase" — ou seja,
+ * trocar de provedor derrubava a conexão em produção sem nenhum aviso em
+ * tempo de build. Postgres gerenciado (Neon, Supabase, RDS) sempre exige TLS;
+ * quem não exige é o Postgres da máquina do desenvolvedor.
+ *
+ * `rejectUnauthorized` fica desligado por padrão porque o pooler do Supabase
+ * apresenta um certificado self-signed na cadeia. Em destino com cadeia
+ * válida — Neon é um — vale ligar DB_SSL_ESTRITO=1 e validar de verdade.
+ */
+const HOSTS_LOCAIS = new Set(['localhost', '127.0.0.1', '::1', ''])
+
+function sslDoDestino(): { rejectUnauthorized: boolean } | undefined {
+  const bruta = process.env.DATABASE_URL ?? ''
+  if (!bruta) return undefined
+
+  // Parse de verdade em vez de regex: `postgresql://localhost/db` não tem
+  // credencial e portanto não tem "@" — um regex ancorado no "@" classificava
+  // o banco local como remoto e tentava TLS contra quem não oferece.
+  let host: string
+  try {
+    host = new URL(bruta).hostname.replace(/^\[|\]$/g, '')
+  } catch {
+    return { rejectUnauthorized: process.env.DB_SSL_ESTRITO === '1' }
+  }
+
+  if (HOSTS_LOCAIS.has(host)) return undefined
+  return { rejectUnauthorized: process.env.DB_SSL_ESTRITO === '1' }
+}
+
 export function getPool(): Pool {
   if (!pool) {
     pool = new Pool({
@@ -68,9 +100,7 @@ export function getPool(): Pool {
       max: Number(process.env.DB_POOL_MAX ?? 5),
       idleTimeoutMillis: 20_000,
       connectionTimeoutMillis: 12_000,
-      ssl: process.env.DATABASE_URL?.includes('supabase')
-        ? { rejectUnauthorized: false }
-        : undefined,
+      ssl: sslDoDestino(),
     })
   }
   return pool

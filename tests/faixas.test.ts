@@ -191,10 +191,19 @@ describe('a tool devolve as faixas separadas', () => {
     expect(r.imoveis.every((i: any) => i.faixa !== 'fora')).toBe(true)
   })
 
-  it('só gasta query de alternativa quando não há alta compatibilidade', async () => {
-    const comMatch = await executarTool('buscar_imoveis', { preco_max: 900_000 })
-    expect(comMatch.alta_compatibilidade).toBeGreaterThan(0)
-    expect(comMatch.alternativas).toBeNull()
+  it('alternativa aparece se e somente se faltar alta compatibilidade', async () => {
+    const r = await executarTool('buscar_imoveis', { preco_max: 900_000 })
+
+    // Sem assumir que o banco tem match: a regra é a equivalência, e ela vale
+    // nos dois sentidos. A versão anterior exigia alta_compatibilidade > 0 e
+    // passou a falhar sozinha quando a coleta envelheceu além de
+    // DIAS_SUSPEITO e o catálogo inteiro virou ressalva — um teste que quebra
+    // pela passagem do tempo não estava medindo a regra.
+    if (r.alta_compatibilidade > 0) {
+      expect(r.alternativas).toBeNull()
+    } else {
+      expect(Array.isArray(r.alternativas)).toBe(true)
+    }
   })
 
   it('sem nada de alta compatibilidade, entrega as saídas', async () => {
