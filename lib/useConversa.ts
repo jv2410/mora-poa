@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ImovelComScore } from './tipos'
+import { useCorretor } from './useCorretor'
 
 export type Msg = {
   role: 'user' | 'assistant'
@@ -24,12 +25,17 @@ type Salvo = { mensagens: Msg[]; imoveis: ImovelComScore[]; atualizadaEm: number
 export function useConversa(perguntaInicial?: string | null) {
   const [mensagens, setMensagens] = useState<Msg[]>([])
   const [imoveis, setImoveis] = useState<ImovelComScore[]>([])
+  // Id da busca que produziu a lista atual. A seleção enviada ao cliente é
+  // ligada a ela, e é dessa ligação que sai a taxa de aproveitamento (quantas
+  // buscas viraram seleção enviada) do painel.
+  const [buscaId, setBuscaId] = useState<number | null>(null)
   const [parcial, setParcial] = useState('')
   const [status, setStatus] = useState('')
   const [carregando, setCarregando] = useState(false)
   const [retomada, setRetomada] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const hidratou = useRef(false)
+  const corretorId = useCorretor()
 
   // Hidrata do localStorage no primeiro mount
   useEffect(() => {
@@ -70,6 +76,7 @@ export function useConversa(perguntaInicial?: string | null) {
     localStorage.removeItem(CHAVE)
     setMensagens([])
     setImoveis([])
+    setBuscaId(null)
     setParcial('')
     setStatus('')
     setRetomada(null)
@@ -108,6 +115,8 @@ export function useConversa(perguntaInicial?: string | null) {
           // Só role e content vão para a API: os imóveis são estado de UI.
           body: JSON.stringify({
             mensagens: novas.map((m) => ({ role: m.role, content: m.content })),
+            // Agrupa as buscas desta sessão. Id anônimo de navegador, não login.
+            corretorId,
           }),
           signal: ctrl.signal,
         })
@@ -136,6 +145,7 @@ export function useConversa(perguntaInicial?: string | null) {
             } else if (ev.tipo === 'imoveis') {
               ultimosImoveis = ev.imoveis
               setImoveis(ev.imoveis)
+              if (ev.buscaId != null) setBuscaId(ev.buscaId)
             } else if (ev.tipo === 'erro') {
               acumulado += (acumulado ? '\n\n' : '') + ev.mensagem
               setParcial(acumulado)
@@ -159,7 +169,11 @@ export function useConversa(perguntaInicial?: string | null) {
       setCarregando(false)
       abortRef.current = null
     },
-    [mensagens]
+    // corretorId entra aqui porque chega depois do primeiro render (o id é lido
+    // do localStorage num effect). Sem a dependência, a primeira busca da
+    // sessão seguiria com a closure antiga e iria sem identidade — justo a
+    // busca que abre a conversa.
+    [mensagens, corretorId]
   )
 
   /**
@@ -181,6 +195,7 @@ export function useConversa(perguntaInicial?: string | null) {
   return {
     mensagens,
     imoveis,
+    buscaId,
     parcial,
     status,
     carregando,

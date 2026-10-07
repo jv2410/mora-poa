@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import CardImovel from './CardImovel'
+import MontarSelecao from './MontarSelecao'
 import type { useConversa } from '@/lib/useConversa'
 
 type Conv = ReturnType<typeof useConversa>
@@ -197,8 +198,14 @@ export function ColunaResultados({ conv }: { conv: Conv }) {
   return (
     <>
       <p className="tag" style={{ marginBottom: 14, textTransform: 'uppercase', display: 'block' }}>
-        {conv.imoveis.length} imóveis · ordenados por match
+        {conv.imoveis.length} imóveis · alta compatibilidade primeiro
       </p>
+
+      {/* Escolher e mandar ao cliente acontece aqui, junto do resultado: é o
+          passo seguinte natural, e tirá-lo de outra tela é o que faz o corretor
+          voltar a mandar prints no WhatsApp. */}
+      <MontarSelecao imoveis={conv.imoveis as any} buscaId={conv.buscaId ?? null} />
+
       <div style={{ display: 'grid', gap: 16 }}>
         {conv.imoveis.map((im) => (
           <CardImovel key={im.id} im={im} />

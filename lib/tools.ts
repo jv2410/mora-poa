@@ -7,6 +7,7 @@ import { raioX } from './raioX'
 import { oQueCompra } from './orcamento'
 import { sinaisIncompletos, notaCompletude } from './completude'
 import { alternativas } from './alternativas'
+import { registrarBusca } from './selecao'
 
 export const TOOLS = [
   {
@@ -168,7 +169,18 @@ function limpar(input: Record<string, unknown>): Criterios {
   ) as Criterios
 }
 
-export async function executarTool(nome: string, input: any): Promise<any> {
+/**
+ * Quem está buscando e com que briefing. Não identifica pessoa: `corretorId` é
+ * um id anônimo de navegador, usado só para agrupar as buscas de uma mesma
+ * sessão enquanto não existe login.
+ */
+export type ContextoBusca = { corretorId?: string | null; briefing?: string | null }
+
+export async function executarTool(
+  nome: string,
+  input: any,
+  contexto?: ContextoBusca
+): Promise<any> {
   switch (nome) {
     case 'buscar_imoveis': {
       const c = limpar(input)
@@ -183,7 +195,20 @@ export async function executarTool(nome: string, input: any): Promise<any> {
       const alta = imoveis.filter((i) => i.faixa === 'alta')
       const ressalva = imoveis.filter((i) => i.faixa === 'ressalva')
 
+      // Toda busca entra no histórico, inclusive a que não achou nada: é a
+      // busca vazia que vira pauta de captação no mapa de demanda não
+      // atendida. Sem gravar desde hoje, o painel não tem o que mostrar em 30
+      // dias — esse dado é retrospectivo e não dá para reconstruir depois.
+      const busca_id = await registrarBusca({
+        corretorId: contexto?.corretorId ?? null,
+        briefing: contexto?.briefing ?? null,
+        criterios: c,
+        alta: alta.length,
+        valeApresentar: ressalva.length,
+      })
+
       return {
+        busca_id,
         criterios_aplicados: c,
         alta_compatibilidade: alta.length,
         vale_apresentar: ressalva.length,

@@ -27,7 +27,14 @@ export default function ChatPanel() {
   }, [conv.enviar])
 
   // Em /chat a conversa já é a página inteira.
-  if (pathname === '/chat') return null
+  // Em /chat a conversa já é a página inteira.
+  //
+  // Em /s/[token] quem está olhando é o COMPRADOR, não o corretor: aquela
+  // página é a seleção que ele recebeu no WhatsApp. Abrir ali o chat da MORA
+  // entregaria a ele o estoque inteiro, o raio-X de preço por bairro e o
+  // caminho para procurar sozinho — exatamente o que o corretor não quer, e o
+  // motivo pelo qual nem o link do anúncio original aparece nessa página.
+  if (pathname === '/chat' || pathname.startsWith('/s/')) return null
 
   if (!aberto) {
     return (

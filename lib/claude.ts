@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { TOOLS, executarTool } from './tools'
+import { TOOLS, executarTool, type ContextoBusca } from './tools'
 
 const client = new Anthropic()
 
@@ -83,7 +83,7 @@ Escreva em português do Brasil, direto e sem enrolação. Nada de emoji.`
 
 export type EventoChat =
   | { tipo: 'texto'; texto: string }
-  | { tipo: 'imoveis'; imoveis: unknown[] }
+  | { tipo: 'imoveis'; imoveis: unknown[]; buscaId?: number | null }
   | { tipo: 'status'; tool: string; detalhe: string }
   | { tipo: 'erro'; mensagem: string }
   | { tipo: 'fim' }
@@ -131,7 +131,8 @@ function narrarTool(nome: string, input: any): string {
 const MAX_ITERACOES = 8
 
 export async function* conversar(
-  mensagens: Anthropic.MessageParam[]
+  mensagens: Anthropic.MessageParam[],
+  contexto?: ContextoBusca
 ): AsyncGenerator<EventoChat> {
   const historico: Anthropic.MessageParam[] = [...mensagens]
 
@@ -169,9 +170,12 @@ export async function* conversar(
 
     for (const c of chamadas) {
       yield { tipo: 'status', tool: c.name, detalhe: narrarTool(c.name, c.input) }
-      const saida = await executarTool(c.name, c.input)
+      const saida = await executarTool(c.name, c.input, contexto)
       if (Array.isArray(saida?.imoveis) && saida.imoveis.length > 0) {
-        yield { tipo: 'imoveis', imoveis: saida.imoveis }
+        // busca_id acompanha os imóveis para a seleção que o corretor montar
+        // ficar ligada à busca que a originou — é o que permite medir, depois,
+        // quantas buscas viraram seleção enviada.
+        yield { tipo: 'imoveis', imoveis: saida.imoveis, buscaId: saida.busca_id ?? null }
       }
       resultados.push({
         type: 'tool_result',

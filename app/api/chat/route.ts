@@ -26,6 +26,23 @@ export async function POST(req: Request) {
   const v = validarMensagens(body?.mensagens)
   if (!v.ok) return erroSSE(v.motivo)
 
+  // Identidade anônima de navegador, gerada no cliente. Não é login e não
+  // identifica pessoa: serve para agrupar as buscas e as seleções de uma mesma
+  // sessão, que é o mínimo para o corretor reencontrar o que mandou ao cliente.
+  // Formato restrito para esse valor não virar vetor de injeção no histórico.
+  const corretorId =
+    typeof body?.corretorId === 'string' && /^[a-z0-9-]{8,64}$/i.test(body.corretorId)
+      ? body.corretorId
+      : null
+
+  // O briefing é a primeira fala do corretor: é o que explica, no histórico de
+  // buscas, por que aquele conjunto de critérios foi pedido.
+  const primeira = v.mensagens.find((m) => m.role === 'user')
+  const briefing =
+    typeof primeira?.content === 'string' ? primeira.content.slice(0, 4000) : null
+
+  const contexto = { corretorId, briefing }
+
   const stream = new ReadableStream({
     async start(controller) {
       // Quando o cliente aborta (botão parar), o controller já fechou e o
@@ -41,7 +58,7 @@ export async function POST(req: Request) {
       }
 
       try {
-        for await (const evento of conversar(v.mensagens)) enviar(evento)
+        for await (const evento of conversar(v.mensagens, contexto)) enviar(evento)
       } catch (erro) {
         console.error('Erro no chat:', erro)
         enviar({

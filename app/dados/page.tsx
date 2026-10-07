@@ -8,7 +8,7 @@ export const revalidate = 3600
 export const metadata = {
   title: 'De onde vêm os dados — MORA.AI',
   description:
-    'Seis portais, coleta datada, deduplicação entre fontes e citação literal em cada atributo. Não vendemos imóvel e não recebemos comissão.',
+    'Estoque de parceiros por feed, estoque próprio da imobiliária, nenhuma raspagem. Deduplicação entre fontes, citação literal em cada atributo e data visível em cada imóvel.',
 }
 
 async function panorama() {
@@ -97,8 +97,16 @@ export default async function Dados() {
 
           {[
             {
-              t: 'A coleta é datada, e a data aparece',
-              d: `Os anúncios foram lidos das páginas públicas desses portais, respeitando o robots.txt de cada um, a uma requisição por segundo. A última coleta foi ${haQuantoTempo(p.ultima)}. Anúncio some, preço muda, imóvel vende — por isso a data importa e por isso ela fica visível na ficha, e não escondida.`,
+              t: 'O modelo de dados é parceria, não raspagem',
+              d: 'A MORA.AI não raspa portal. Em produção, o estoque vem de duas fontes: feed XML ou API de portais parceiros, com acordo formal de leitura, e o estoque próprio da imobiliária contratante. O mercado imobiliário brasileiro já opera nesse padrão de integração — a ImobiBrasil, por exemplo, integra nativamente com mais de cem portais. Acordo formal é o que elimina de uma vez o risco de LGPD, de contrato e de concorrência desleal.',
+            },
+            {
+              t: 'O que você está vendo agora é um piloto técnico',
+              d: `A base atual foi montada antes dessa decisão, lendo páginas públicas dos portais com robots.txt respeitado e uma requisição por segundo, para provar que o motor de match funciona com anúncio brasileiro de verdade. Ela não é a base de produção e não cresce: a última leitura foi ${haQuantoTempo(p.ultima)}. O que vale desta fase é o motor — faixas de compatibilidade, deduplicação, saída quantificada do "não encontrei" — e ele funciona igual com dado vindo de feed.`,
+            },
+            {
+              t: 'A data aparece, e quando envelhece a MORA avisa',
+              d: 'Anúncio some, preço muda, imóvel vende. Cada imóvel carrega quantos dias faz que a coleta o confirmou, e acima de trinta dias ele perde a alta compatibilidade e desce no ranking, com o aviso escrito na ressalva. Preferimos dizer "pode já estar vendido" a deixar você descobrir isso na frente do cliente.',
             },
             {
               t: 'O mesmo imóvel em dois portais vira um só',
@@ -113,8 +121,12 @@ export default async function Dados() {
               d: 'Nota de match, percentil de preço, mediana do bairro, ITBI, parcela do financiamento — tudo é calculado por código, em SQL e TypeScript, e testado. O modelo de linguagem recebe o resultado pronto e só escreve a explicação em português. Ele não estima, não arredonda e não inventa imóvel: se um apartamento aparece na conversa, ele existe no banco. Enquanto a busca roda, a interface mostra qual consulta está sendo feita, com os critérios reais.',
             },
             {
+              t: 'Contato do anunciante não existe aqui',
+              d: 'A MORA não guarda nem exibe nome, foto ou telefone de corretor anunciante ou de proprietário. Para imóvel de parceiro, você recebe os dados estruturados e o link do anúncio original — e esse link aparece só para você. Na seleção que vai ao seu cliente ele nunca aparece, porque o comprador chegando ao anúncio chega ao corretor que captou, ou seja, ao seu concorrente.',
+            },
+            {
               t: 'O que ainda é limitação',
-              d: 'A amostra é pequena para alguns bairros: quando isso acontece, dizemos o tamanho da amostra em vez de fingir conclusão. Só um dos portais publica coordenadas, então não há busca por distância ainda. E a coleta por leitura de páginas públicas serve para este projeto, mas precisa virar acordo com as fontes antes de qualquer uso comercial.',
+              d: 'A amostra é pequena para alguns bairros: quando isso acontece, dizemos o tamanho da amostra em vez de fingir conclusão. Só um dos portais publica coordenadas, então não há busca por distância nem mapa ainda. Visitas, propostas e vendas virão do CRM do cliente e por enquanto não existem no painel — sem esse dado, indicador de retorno seria autodeclarado.',
             },
           ].map((s) => (
             <div key={s.t} style={{ marginBottom: 34 }}>
