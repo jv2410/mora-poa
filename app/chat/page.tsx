@@ -24,7 +24,7 @@ function ChatInterno() {
         </Link>
         <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
           <Link href="/imoveis" className="tag">
-            ver catálogo
+            ver estoque
           </Link>
           <Link href="/dados" className="tag">
             de onde vêm os dados

@@ -8,9 +8,9 @@ import type { useConversa } from '@/lib/useConversa'
 type Conv = ReturnType<typeof useConversa>
 
 export const SUGESTOES = [
-  '2 quartos até 500 mil com vaga',
-  'o mais barato pra morar sozinho',
-  'quero algo no Bom Fim ou Cidade Baixa',
+  'Casal, 2 quartos até 500 mil, precisa de vaga',
+  'Investidor quer 2 dorm para alugar, condomínio baixo',
+  'Família pediu 3 dormitórios no Bom Fim ou Cidade Baixa',
 ]
 
 /** Coluna da conversa: mensagens, status de tool, input. */
@@ -66,11 +66,12 @@ export function ColunaConversa({
         {vazio ? (
           <div>
             <p style={{ color: 'var(--ink)', marginBottom: 8, fontWeight: 600, fontSize: 17 }}>
-              Me conta o que você procura.
+              Cole o briefing do cliente.
             </p>
             <p style={{ color: 'var(--muted)', fontSize: 14.5, marginBottom: 22, lineHeight: 1.6 }}>
-              Fala do jeito que você pensa — orçamento, bairro, quantos quartos, se precisa de
-              vaga. Eu comparo com o mercado do bairro e te digo o que serve e o que não serve.
+              Do jeito que o cliente falou — orçamento, bairro, dormitórios, se precisa de
+              vaga, o que é obrigatório e o que é desejável. Eu cruzo com o estoque e separo o
+              que bate tudo do que vale apresentar com ressalva.
             </p>
             {SUGESTOES.map((s) => (
               <button
@@ -139,7 +140,7 @@ export function ColunaConversa({
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
-          placeholder="Digite aqui…"
+          placeholder="Cole o briefing ou escreva aqui…"
           disabled={conv.carregando}
           style={{
             flex: 1,
@@ -190,7 +191,7 @@ export function ColunaResultados({ conv }: { conv: Conv }) {
   if (conv.imoveis.length === 0) {
     return (
       <p style={{ color: 'var(--muted-2)', fontSize: 13.5, marginTop: 8 }}>
-        Os imóveis aparecem aqui conforme a gente conversa.
+        Os imóveis aparecem aqui conforme o briefing é cruzado com o estoque.
       </p>
     )
   }
