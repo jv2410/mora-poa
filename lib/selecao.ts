@@ -48,6 +48,7 @@ function novoToken(): string {
 
 export async function criarSelecao(args: {
   corretorId: string
+  usuarioId?: number | null
   buscaId?: number | null
   cliente?: string | null
   itens: Array<{ imovel_id: number; faixa: Faixa; ressalva: string | null }>
@@ -58,9 +59,15 @@ export async function criarSelecao(args: {
     await cliente.query('BEGIN')
     const token = novoToken()
     const { rows } = await cliente.query(
-      `INSERT INTO selecoes (token, corretor_id, busca_id, cliente)
-       VALUES ($1, $2, $3, $4) RETURNING id`,
-      [token, args.corretorId, args.buscaId ?? null, args.cliente ?? null]
+      `INSERT INTO selecoes (token, corretor_id, usuario_id, busca_id, cliente)
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [
+        token,
+        args.corretorId,
+        args.usuarioId ?? null,
+        args.buscaId ?? null,
+        args.cliente ?? null,
+      ]
     )
     const selecaoId = rows[0].id
 
@@ -177,7 +184,7 @@ export async function responder(
 }
 
 /** As seleções de um corretor, com o andamento de cada uma. */
-export async function doCorretor(corretorId: string, limite = 20) {
+export async function doCorretor(corretorId: string, limite = 20, usuarioId?: number | null) {
   const { rows } = await getPool().query(
     `SELECT s.token, s.cliente, s.criada_em, s.enviada_em, s.aberturas,
             count(i.*)::int                                            total,
@@ -185,11 +192,13 @@ export async function doCorretor(corretorId: string, limite = 20) {
             count(*) FILTER (WHERE i.status = 'recusado')::int           recusados
      FROM selecoes s
      LEFT JOIN selecao_itens i ON i.selecao_id = s.id
-     WHERE s.corretor_id = $1
+     -- Casa pelos dois: o histórico anônimo deste navegador e o que já está
+     -- atribuído ao usuário logado.
+     WHERE s.corretor_id = $1 OR ($3::int IS NOT NULL AND s.usuario_id = $3)
      GROUP BY s.id
      ORDER BY s.criada_em DESC
      LIMIT $2`,
-    [corretorId, limite]
+    [corretorId, limite, usuarioId ?? null]
   )
   return rows
 }
@@ -201,17 +210,23 @@ export async function doCorretor(corretorId: string, limite = 20) {
  */
 export async function registrarBusca(args: {
   corretorId: string | null
+  usuarioId?: number | null
   briefing: string | null
   criterios: unknown
   alta: number
   valeApresentar: number
 }): Promise<number | null> {
   try {
+    // usuario_id é o que o painel agrega. Sem ele, a busca de alguém logado
+    // ficaria invisível no próprio painel dessa pessoa — o corretor_id só
+    // serve para o histórico anônimo de antes do login.
     const { rows } = await getPool().query(
-      `INSERT INTO buscas (corretor_id, briefing, criterios, alta, vale_apresentar)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      `INSERT INTO buscas
+         (corretor_id, usuario_id, briefing, criterios, alta, vale_apresentar)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [
         args.corretorId,
+        args.usuarioId ?? null,
         args.briefing,
         JSON.stringify(args.criterios ?? {}),
         args.alta,

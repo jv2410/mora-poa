@@ -1,5 +1,6 @@
 import { criarSelecao, marcarEnviada } from '@/lib/selecao'
 import { verificarLimite, ipDaRequisicao } from '@/lib/ratelimit'
+import { usuarioAtual } from '@/lib/auth'
 
 export const runtime = 'nodejs'
 
@@ -50,8 +51,10 @@ export async function POST(req: Request) {
   }
 
   try {
+    const u = await usuarioAtual()
     const token = await criarSelecao({
       corretorId,
+      usuarioId: u?.id ?? null,
       buscaId: Number.isInteger(body?.buscaId) ? body.buscaId : null,
       cliente: typeof body?.cliente === 'string' ? body.cliente.slice(0, 120) : null,
       itens: limpos as any,

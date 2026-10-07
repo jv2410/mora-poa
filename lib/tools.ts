@@ -174,7 +174,11 @@ function limpar(input: Record<string, unknown>): Criterios {
  * um id anônimo de navegador, usado só para agrupar as buscas de uma mesma
  * sessão enquanto não existe login.
  */
-export type ContextoBusca = { corretorId?: string | null; briefing?: string | null }
+export type ContextoBusca = {
+  corretorId?: string | null
+  usuarioId?: number | null
+  briefing?: string | null
+}
 
 export async function executarTool(
   nome: string,
@@ -201,6 +205,7 @@ export async function executarTool(
       // dias — esse dado é retrospectivo e não dá para reconstruir depois.
       const busca_id = await registrarBusca({
         corretorId: contexto?.corretorId ?? null,
+        usuarioId: contexto?.usuarioId ?? null,
         briefing: contexto?.briefing ?? null,
         criterios: c,
         alta: alta.length,

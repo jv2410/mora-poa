@@ -13,7 +13,8 @@ export default function Nav() {
           <Link href="/mercado">Mercado</Link>
           <Link href="/estoque">Estoque</Link>
           <Link href="/orcamento">Orçamento</Link>
-          <Link href="/dados">De onde vêm os dados</Link>
+          <Link href="/dados">Dados</Link>
+          <Link href="/painel">Painel</Link>
         </div>
       </nav>
     </div>

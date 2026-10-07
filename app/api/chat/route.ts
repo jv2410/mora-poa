@@ -1,4 +1,5 @@
 import { conversar } from '@/lib/claude'
+import { usuarioAtual } from '@/lib/auth'
 import { verificarLimite, validarMensagens, ipDaRequisicao } from '@/lib/ratelimit'
 
 export const runtime = 'nodejs'
@@ -41,7 +42,10 @@ export async function POST(req: Request) {
   const briefing =
     typeof primeira?.content === 'string' ? primeira.content.slice(0, 4000) : null
 
-  const contexto = { corretorId, briefing }
+  // Quem está logado. A busca é atribuída à pessoa, e é isso que faz ela
+  // aparecer no painel dela e no da equipe.
+  const u = await usuarioAtual()
+  const contexto = { corretorId, usuarioId: u?.id ?? null, briefing }
 
   const stream = new ReadableStream({
     async start(controller) {
