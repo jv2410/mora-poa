@@ -265,21 +265,32 @@ export async function comercial(
 
 /** Matriz de adoção por corretor — a visão do gerente comercial. */
 export async function adocaoPorCorretor(contaId: number, dias = DIAS) {
+  // Subconsultas em vez de LEFT JOINs encadeados.
+  //
+  // Juntar buscas e selecoes na mesma linha multiplica uma pela outra: com 14
+  // buscas e 8 aprovações, o contador mostrava 112. Cada agregado precisa da
+  // sua própria consulta porque eles não compartilham granularidade — buscas e
+  // itens de seleção não são a mesma unidade.
   const { rows } = await getPool().query(
     `SELECT u.id, u.nome, u.papel,
-            count(DISTINCT b.id)::int buscas,
-            count(DISTINCT s.id) FILTER (WHERE s.enviada_em IS NOT NULL)::int selecoes,
-            count(i.*) FILTER (WHERE i.status = 'aprovado_comprador')::int aprovados,
-            max(b.criada_em) ultima_busca
+            (SELECT count(*)::int FROM buscas b
+             WHERE b.usuario_id = u.id
+               AND b.criada_em > now() - ($2 || ' days')::interval) buscas,
+            (SELECT count(*)::int FROM selecoes s
+             WHERE s.usuario_id = u.id
+               AND s.enviada_em IS NOT NULL
+               AND s.criada_em > now() - ($2 || ' days')::interval) selecoes,
+            (SELECT count(*)::int
+             FROM selecao_itens i
+             JOIN selecoes s ON s.id = i.selecao_id
+             WHERE s.usuario_id = u.id
+               AND i.status = 'aprovado_comprador'
+               AND s.criada_em > now() - ($2 || ' days')::interval) aprovados,
+            (SELECT max(b.criada_em) FROM buscas b
+             WHERE b.usuario_id = u.id) ultima_busca
      FROM usuarios u
-     LEFT JOIN buscas b
-       ON b.usuario_id = u.id AND b.criada_em > now() - ($2 || ' days')::interval
-     LEFT JOIN selecoes s
-       ON s.usuario_id = u.id AND s.criada_em > now() - ($2 || ' days')::interval
-     LEFT JOIN selecao_itens i ON i.selecao_id = s.id
      WHERE u.conta_id = $1
-     GROUP BY u.id, u.nome, u.papel
-     ORDER BY count(DISTINCT b.id) DESC`,
+     ORDER BY buscas DESC`,
     [contaId, String(dias)]
   )
 
