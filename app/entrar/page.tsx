@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Nav from '@/components/Nav'
 import FormAuth from '@/components/FormAuth'
 import { acaoEntrar } from '@/lib/acoesAuth'
@@ -21,6 +22,7 @@ export default async function Entrar() {
           <p style={{ color: 'var(--muted)', marginBottom: 32, fontSize: 15.5 }}>
             Suas buscas e seleções continuam onde você parou.
           </p>
+          <Suspense fallback={null}>
           <FormAuth
             acao={acaoEntrar}
             botao="Entrar"
@@ -30,6 +32,7 @@ export default async function Entrar() {
             ]}
             rodape={{ texto: 'Ainda não tem conta?', link: 'criar conta', href: '/criar-conta' }}
           />
+          </Suspense>
         </div>
       </section>
     </>

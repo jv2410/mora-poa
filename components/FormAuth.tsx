@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useCorretor } from '@/lib/useCorretor'
 
 type Campo = { nome: string; label: string; tipo?: string; dica?: string; opcional?: boolean }
@@ -26,10 +27,14 @@ export default function FormAuth({
 }) {
   const [estado, enviar, pendente] = useActionState(acao, undefined)
   const corretorId = useCorretor()
+  // Quem foi barrado numa tela volta para ela depois de entrar, em vez de
+  // cair no painel e ter que navegar de novo.
+  const destino = useSearchParams().get('destino') ?? ''
 
   return (
     <form action={enviar} style={{ display: 'grid', gap: 16 }}>
       <input type="hidden" name="corretorId" value={corretorId ?? ''} />
+      <input type="hidden" name="destino" value={destino} />
 
       {campos.map((c) => (
         <label key={c.nome} style={{ display: 'grid', gap: 7 }}>

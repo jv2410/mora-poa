@@ -7,6 +7,19 @@ import { criarConta, entrar, abrirSessao, fecharSessao, reivindicarHistorico } f
  * Server Actions do login. Ficam separadas de `lib/auth.ts` para aquele módulo
  * continuar importável por rotas e páginas sem arrastar a diretiva 'use server'.
  */
+/**
+ * Só caminhos internos viram destino.
+ *
+ * Um `destino` vindo da URL é entrada do usuário: sem esta checagem, um link
+ * como /entrar?destino=https://outro-site bastaria para transformar a tela de
+ * login da MORA em trampolim para qualquer lugar, com a credibilidade do
+ * domínio dela. `//` também é barrado — o navegador o trata como host.
+ */
+function destinoSeguro(bruto: unknown): string {
+  const d = typeof bruto === 'string' ? bruto : ''
+  return d.startsWith('/') && !d.startsWith('//') ? d : '/painel'
+}
+
 export async function acaoEntrar(_: unknown, form: FormData) {
   const email = String(form.get('email') ?? '')
   const senha = String(form.get('senha') ?? '')
@@ -18,7 +31,7 @@ export async function acaoEntrar(_: unknown, form: FormData) {
   await abrirSessao(r.usuarioId)
   // Costura o histórico anônimo deste navegador com a conta.
   if (corretorId) await reivindicarHistorico(r.usuarioId, corretorId)
-  redirect('/painel')
+  redirect(destinoSeguro(form.get('destino')))
 }
 
 export async function acaoCriarConta(_: unknown, form: FormData) {
@@ -34,7 +47,7 @@ export async function acaoCriarConta(_: unknown, form: FormData) {
   await abrirSessao(r.usuarioId)
   const corretorId = String(form.get('corretorId') ?? '')
   if (corretorId) await reivindicarHistorico(r.usuarioId, corretorId)
-  redirect('/painel')
+  redirect(destinoSeguro(form.get('destino')))
 }
 
 export async function acaoSair() {

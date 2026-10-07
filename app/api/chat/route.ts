@@ -44,7 +44,12 @@ export async function POST(req: Request) {
 
   // Quem está logado. A busca é atribuída à pessoa, e é isso que faz ela
   // aparecer no painel dela e no da equipe.
+  //
+  // A sessão é obrigatória: proteger a tela do Briefing e deixar este endpoint
+  // aberto não protegeria nada — é aqui que mora o custo de inferência e o
+  // acesso ao estoque inteiro.
   const u = await usuarioAtual()
+  if (!u) return erroSSE('Entre na sua conta para usar o Briefing.')
   const contexto = { corretorId, usuarioId: u?.id ?? null, briefing }
 
   const stream = new ReadableStream({

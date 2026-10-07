@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Nav from '@/components/Nav'
 import FormAuth from '@/components/FormAuth'
 import { acaoCriarConta } from '@/lib/acoesAuth'
@@ -22,6 +23,7 @@ export default async function CriarConta() {
             Você entra como diretor e depois adiciona os corretores. Quem cadastra é quem
             assina.
           </p>
+          <Suspense fallback={null}>
           <FormAuth
             acao={acaoCriarConta}
             botao="Criar conta"
@@ -45,6 +47,7 @@ export default async function CriarConta() {
             ]}
             rodape={{ texto: 'Já tem conta?', link: 'entrar', href: '/entrar' }}
           />
+          </Suspense>
         </div>
       </section>
     </>

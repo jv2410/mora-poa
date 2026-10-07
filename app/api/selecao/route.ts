@@ -24,6 +24,11 @@ export async function POST(req: Request) {
     return Response.json({ erro: 'Pedido inválido.' }, { status: 400 })
   }
 
+  // Criar seleção é ação de corretor autenticado. A resposta do comprador vive
+  // em [token]/route.ts e continua sem login, porque é o link do WhatsApp.
+  const u = await usuarioAtual()
+  if (!u) return Response.json({ erro: 'Entre na sua conta.' }, { status: 401 })
+
   const corretorId = body?.corretorId
   if (typeof corretorId !== 'string' || !ID_VALIDO.test(corretorId)) {
     return Response.json({ erro: 'Sessão não identificada.' }, { status: 400 })
@@ -51,7 +56,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    const u = await usuarioAtual()
     const token = await criarSelecao({
       corretorId,
       usuarioId: u?.id ?? null,
