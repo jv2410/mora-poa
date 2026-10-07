@@ -96,9 +96,17 @@ export function getPool(): Pool {
       // resto do banco. O search_path deixa todas as queries funcionarem sem
       // prefixo, iguais ao ambiente local.
       options: process.env.DB_SCHEMA ? `-c search_path=${process.env.DB_SCHEMA}` : undefined,
-      // O Supabase corta conexão ociosa; pool enxuto evita erro em serverless.
-      max: Number(process.env.DB_POOL_MAX ?? 5),
-      idleTimeoutMillis: 20_000,
+      // Uma conexão por instância, não cinco.
+      //
+      // Cada invocação serverless carrega o seu próprio pool, e o pooler do
+      // Supabase tem teto de clientes. Com 5 por instância, três instâncias
+      // simultâneas esgotavam o limite e o painel respondia 500 —
+      // "max clients reached". Uma consulta por requisição não precisa de mais
+      // de uma conexão; o paralelismo real está no pooler, não aqui.
+      max: Number(process.env.DB_POOL_MAX ?? 1),
+      // Devolve a conexão rápido: entre duas requisições a função pode ficar
+      // minutos parada segurando o que outra instância precisa.
+      idleTimeoutMillis: 5_000,
       connectionTimeoutMillis: 12_000,
       ssl: sslDoDestino(),
     })
