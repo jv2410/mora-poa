@@ -8,6 +8,7 @@ import { oQueCompra } from './orcamento'
 import { sinaisIncompletos, notaCompletude } from './completude'
 import { alternativas } from './alternativas'
 import { registrarBusca } from './selecao'
+import { contarUnicos } from './db'
 
 export const TOOLS = [
   {
@@ -210,6 +211,10 @@ export async function executarTool(
         criterios: c,
         alta: alta.length,
         valeApresentar: ressalva.length,
+        // O filtro percorre o estoque inteiro para separar estes poucos. É
+        // esse número que mede a escala do trabalho, não o tamanho da lista
+        // devolvida.
+        analisados: await contarUnicos().catch(() => null),
       })
 
       return {

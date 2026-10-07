@@ -23,7 +23,7 @@ export default async function Painel() {
   const [ef, qa, com, selecoes, avisos] = await Promise.all([
     eficiencia(ids, u.min_por_30_imoveis),
     qualidade(ids),
-    comercial(ids),
+    comercial(ids, u.mensalidade, u.comissao_pct),
     doCorretor(String(u.id), 20, u.id).catch(() => []),
     alertas(ids),
   ])
@@ -136,7 +136,7 @@ export default async function Painel() {
         </div>
 
         {/* ---------------- O que vem do CRM ---------------- */}
-        <BlocoCRM aprovacoes={com.aprovacoes_comprador} />
+        <BlocoCRM dados={com} />
 
         {/* ---------------- Alertas acionáveis ---------------- */}
         <h3 style={{ marginBottom: 16 }}>Precisa de um telefonema</h3>

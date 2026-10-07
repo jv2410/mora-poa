@@ -1,119 +1,121 @@
-import Link from 'next/link'
+import { brl } from '@/lib/formato'
+import type { Comercial } from '@/lib/indicadores'
 
 /**
- * Os indicadores que vêm do CRM, com o visual montado e sem número inventado.
+ * Resultado comercial: do imóvel aprovado pelo comprador até a venda fechada.
  *
- * O documento é direto: sem o dado de desfecho, o painel de ROI é teatro, e o
- * dono de imobiliária percebe isso na segunda renovação. Então a escolha aqui
- * é mostrar a estrutura real — os mesmos blocos, nas mesmas posições — com o
- * valor substituído por um traço e o motivo escrito.
- *
- * Mostrar "0 visitas" quando o que falta é conectar o CRM seria pior que não
- * mostrar nada: o diretor leria como "a ferramenta não gerou resultado".
+ * Os rótulos usam "influenciado" e "potencial" porque é o que os números são.
+ * A MORA participa do caminho até a venda; ela não fecha negócio. Chamar de
+ * "gerado" transformaria qualquer negócio que caísse numa promessa quebrada.
  */
 export default function BlocoCRM({
-  aprovacoes,
+  dados,
   compacto = false,
 }: {
-  aprovacoes: number
+  dados: Comercial
   compacto?: boolean
 }) {
-  const doCRM = [
-    { rotulo: 'Visitas geradas', prova: 'o primeiro resultado concreto' },
-    { rotulo: 'Propostas', prova: 'onde o funil aperta' },
-    { rotulo: 'Vendas', prova: 'o desfecho' },
-    { rotulo: 'VGV influenciado', prova: 'o tamanho do dinheiro em jogo' },
+  const cartoes = [
+    {
+      rotulo: 'Aprovações do comprador',
+      valor: String(dados.aprovacoes_comprador),
+      nota: 'clicaram em "quero visitar" na seleção enviada',
+      destaque: true,
+    },
+    {
+      rotulo: 'Visitas',
+      valor: String(dados.visitas),
+      nota:
+        dados.visitas_realizadas > 0
+          ? `${dados.visitas_realizadas} já realizadas`
+          : 'agendadas no período',
+    },
+    {
+      rotulo: 'Propostas',
+      valor: String(dados.propostas),
+      nota: 'negociações abertas a partir de uma seleção',
+    },
+    {
+      rotulo: 'Vendas',
+      valor: String(dados.vendas),
+      nota: 'negócios ganhos no período',
+      destaque: true,
+    },
   ]
 
   return (
     <section style={{ marginBottom: 48 }}>
+      <h3 style={{ marginBottom: 16 }}>Resultado comercial</h3>
+
       <div
         style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 16,
-          flexWrap: 'wrap',
-          marginBottom: 16,
+          display: 'grid',
+          gridTemplateColumns: `repeat(auto-fit, minmax(${compacto ? 160 : 190}px, 1fr))`,
+          gap: 12,
+          marginBottom: 20,
         }}
       >
-        <h3 style={{ margin: 0 }}>Resultado comercial</h3>
-        <span
-          style={{
-            fontSize: 11.5,
-            fontFamily: 'var(--mono)',
-            letterSpacing: '.1em',
-            textTransform: 'uppercase',
-            color: 'var(--ressalva)',
-            background: 'var(--ressalva-fundo)',
-            padding: '5px 11px',
-            borderRadius: 999,
-          }}
-        >
-          CRM não conectado
-        </span>
-      </div>
-
-      {/* O último número real do funil antes do CRM. */}
-      <div
-        className="card"
-        style={{ marginBottom: 16, borderColor: 'var(--green-dim)' }}
-      >
-        <span className="tag">Aprovações do comprador</span>
-        <p style={{ fontSize: 40, fontWeight: 800, color: 'var(--green)', margin: '6px 0' }}>
-          {aprovacoes}
-        </p>
-        <p style={{ color: 'var(--muted)', fontSize: 14.5, lineHeight: 1.6 }}>
-          Compradores que clicaram em &ldquo;quero visitar&rdquo; na seleção que você mandou.
-          Este número a MORA mede sozinha — é o passo imediatamente anterior à visita.
-        </p>
+        {cartoes.map((c) => (
+          <div key={c.rotulo} className="card">
+            <span className="tag">{c.rotulo}</span>
+            <p
+              style={{
+                fontSize: 38,
+                fontWeight: 800,
+                margin: '6px 0 4px',
+                color: c.destaque ? 'var(--green)' : 'var(--ink)',
+              }}
+            >
+              {c.valor}
+            </p>
+            <p style={{ color: 'var(--muted)', fontSize: 13.5 }}>{c.nota}</p>
+          </div>
+        ))}
       </div>
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(${compacto ? 150 : 180}px, 1fr))`,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: 12,
-          marginBottom: 16,
         }}
       >
-        {doCRM.map((d) => (
-          <div
-            key={d.rotulo}
-            style={{
-              border: '1px dashed var(--line)',
-              borderRadius: 16,
-              padding: '20px 18px',
-              background: 'var(--elev)',
-            }}
-          >
-            <span className="tag">{d.rotulo}</span>
-            <p
-              style={{
-                fontSize: 34,
-                fontWeight: 800,
-                color: 'var(--muted-2)',
-                margin: '6px 0 4px',
-              }}
-            >
-              —
-            </p>
-            <p style={{ color: 'var(--muted-2)', fontSize: 13 }}>{d.prova}</p>
-          </div>
-        ))}
-      </div>
+        <div className="card" style={{ borderColor: 'var(--green-dim)' }}>
+          <span className="tag">VGV influenciado</span>
+          <p style={{ fontSize: 32, fontWeight: 800, margin: '6px 0 4px', color: 'var(--green)' }}>
+            {brl(dados.vgv_influenciado)}
+          </p>
+          <p style={{ color: 'var(--muted)', fontSize: 13.5 }}>
+            soma das vendas em que o imóvel passou por uma seleção
+          </p>
+        </div>
 
-      <div className="card">
-        <p style={{ fontSize: 14.5, lineHeight: 1.75, color: 'var(--muted)' }}>
-          Visita, proposta e venda acontecem no seu CRM, não aqui — e a MORA não vai estimar
-          o que não mediu. Quando o CRM estiver conectado, estes quatro blocos se preenchem e
-          liberam o múltiplo de retorno: a visita conta como originada pela MORA se o imóvel
-          visitado estiver entre os aprovados pelo comprador e a visita ocorrer em até 90
-          dias após o envio.{' '}
-          <Link href="/dados" style={{ borderBottom: '1px solid var(--muted-2)' }}>
-            como calculamos
-          </Link>
-        </p>
+        <div className="card">
+          <span className="tag">Comissão potencial</span>
+          <p style={{ fontSize: 32, fontWeight: 800, margin: '6px 0 4px' }}>
+            {brl(dados.comissao_potencial)}
+          </p>
+          <p style={{ color: 'var(--muted)', fontSize: 13.5 }}>
+            sobre o VGV influenciado, no percentual do seu cadastro
+          </p>
+        </div>
+
+        {dados.multiplo_retorno != null ? (
+          <div className="card" style={{ borderColor: 'var(--green)' }}>
+            <span className="tag">Múltiplo de retorno</span>
+            <p
+              style={{ fontSize: 32, fontWeight: 800, margin: '6px 0 4px', color: 'var(--green)' }}
+            >
+              {dados.multiplo_retorno.toLocaleString('pt-BR')}×
+            </p>
+            <p style={{ color: 'var(--muted)', fontSize: 13.5 }}>
+              comissão influenciada dividida pela mensalidade
+              {dados.custo_por_visita != null
+                ? ` · ${brl(dados.custo_por_visita)} por visita`
+                : ''}
+            </p>
+          </div>
+        ) : null}
       </div>
     </section>
   )

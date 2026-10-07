@@ -45,20 +45,23 @@ export type Qualidade = {
 /**
  * Camadas 3 e 4: resultado comercial e retorno.
  *
- * Tudo aqui é null até existir integração com CRM, porque visita, proposta e
- * venda acontecem lá. O que a MORA tem de verdade é a aprovação do comprador,
- * que é o passo imediatamente anterior — e esse número é real.
+ * Lê das tabelas `visitas` e `negocios`, que são as mesmas que a sincronização
+ * com o CRM preenche. O painel não sabe — nem precisa saber — se a linha foi
+ * registrada aqui ou veio de fora: o campo `origem` guarda isso para auditoria,
+ * e o cálculo é idêntico nos dois casos.
  */
 export type Comercial = {
-  conectado_crm: false
   aprovacoes_comprador: number
-  visitas: null
-  propostas: null
-  vendas: null
-  vgv_influenciado: null
-  comissao_potencial: null
-  multiplo_retorno: null
-  custo_por_visita: null
+  visitas: number
+  visitas_realizadas: number
+  propostas: number
+  vendas: number
+  /** Soma das vendas ganhas cujo imóvel passou por uma seleção da MORA. */
+  vgv_influenciado: number
+  comissao_potencial: number
+  /** Comissão influenciada ÷ mensalidade. Null sem mensalidade cadastrada. */
+  multiplo_retorno: number | null
+  custo_por_visita: number | null
 }
 
 const DIAS = 30
@@ -87,7 +90,8 @@ export async function eficiencia(
 
   const { rows } = await getPool().query(
     `SELECT count(*)::int buscas,
-            coalesce(sum(alta + vale_apresentar), 0)::int analisados
+            -- coalesce para buscas gravadas antes de a coluna existir.
+            coalesce(sum(coalesce(analisados, alta + vale_apresentar)), 0)::int analisados
      FROM buscas
      WHERE usuario_id = ANY($1) AND criada_em > now() - ($2 || ' days')::interval`,
     [usuarioIds, String(dias)]
@@ -184,34 +188,78 @@ export async function qualidade(usuarioIds: number[], dias = DIAS): Promise<Qual
 }
 
 /**
- * O que viria do CRM. Devolve a estrutura com null e o único número real que
- * temos neste trecho do funil: a aprovação do comprador.
+ * O resultado comercial do período.
+ *
+ * "Influenciado" e "potencial" são os rótulos corretos e estão nos nomes dos
+ * campos de propósito: a MORA não gera a venda, ela participa do caminho até
+ * ela. Dizer "geramos" e o negócio cair destrói a confiança de uma vez.
  */
-export async function comercial(usuarioIds: number[], dias = DIAS): Promise<Comercial> {
-  let aprovacoes = 0
-  if (usuarioIds.length > 0) {
-    const { rows } = await getPool().query(
-      `SELECT count(*)::int n
-       FROM selecao_itens i
-       JOIN selecoes s ON s.id = i.selecao_id
-       WHERE s.usuario_id = ANY($1)
-         AND i.status = 'aprovado_comprador'
-         AND s.criada_em > now() - ($2 || ' days')::interval`,
-      [usuarioIds, String(dias)]
-    )
-    aprovacoes = rows[0].n
-  }
-
-  return {
-    conectado_crm: false,
-    aprovacoes_comprador: aprovacoes,
-    visitas: null,
-    propostas: null,
-    vendas: null,
-    vgv_influenciado: null,
-    comissao_potencial: null,
+export async function comercial(
+  usuarioIds: number[],
+  mensalidade: number | null,
+  comissaoPct: number,
+  dias = DIAS
+): Promise<Comercial> {
+  const vazio: Comercial = {
+    aprovacoes_comprador: 0,
+    visitas: 0,
+    visitas_realizadas: 0,
+    propostas: 0,
+    vendas: 0,
+    vgv_influenciado: 0,
+    comissao_potencial: 0,
     multiplo_retorno: null,
     custo_por_visita: null,
+  }
+  if (usuarioIds.length === 0) return vazio
+
+  const janela = [usuarioIds, String(dias)]
+
+  const { rows: ap } = await getPool().query(
+    `SELECT count(*)::int n
+     FROM selecao_itens i
+     JOIN selecoes s ON s.id = i.selecao_id
+     WHERE s.usuario_id = ANY($1)
+       AND i.status = 'aprovado_comprador'
+       AND s.criada_em > now() - ($2 || ' days')::interval`,
+    janela
+  )
+
+  const { rows: v } = await getPool().query(
+    `SELECT count(*)::int total,
+            count(*) FILTER (WHERE status = 'realizada')::int realizadas
+     FROM visitas
+     WHERE usuario_id = ANY($1) AND criada_em > now() - ($2 || ' days')::interval`,
+    janela
+  )
+
+  const { rows: n } = await getPool().query(
+    `SELECT count(*)::int propostas,
+            count(*) FILTER (WHERE status = 'ganho')::int vendas,
+            coalesce(sum(valor) FILTER (WHERE status = 'ganho'), 0)::numeric vgv
+     FROM negocios
+     WHERE usuario_id = ANY($1) AND criado_em > now() - ($2 || ' days')::interval`,
+    janela
+  )
+
+  const vgv = Number(n[0].vgv)
+  const comissao = vgv * (comissaoPct / 100)
+  const visitas = v[0].total as number
+
+  return {
+    aprovacoes_comprador: ap[0].n,
+    visitas,
+    visitas_realizadas: v[0].realizadas,
+    propostas: n[0].propostas,
+    vendas: n[0].vendas,
+    vgv_influenciado: vgv,
+    comissao_potencial: Math.round(comissao),
+    // Sem mensalidade cadastrada não há divisor, e inventar um seria pior que
+    // deixar o campo vazio.
+    multiplo_retorno:
+      mensalidade && mensalidade > 0 ? Math.round((comissao / mensalidade) * 10) / 10 : null,
+    custo_por_visita:
+      mensalidade && visitas > 0 ? Math.round(mensalidade / visitas) : null,
   }
 }
 

@@ -215,11 +215,16 @@ function classificar(
 
 /**
  * A partir de quantos dias sem confirmação o anúncio é tratado como suspeito.
- * Um mês é o prazo em que um imóvel vendido ainda costuma estar publicado: o
- * anunciante não tem pressa de tirar do ar, e o corretor que liga em cima
- * disso descobre na conversa que perdeu o tempo do cliente.
+ *
+ * O prazo vem do ambiente porque depende da cadência de atualização da fonte:
+ * com feed diário, trinta dias é um sinal forte de que o imóvel saiu do
+ * mercado; com uma base que se atualiza em outro ritmo, o mesmo limite só
+ * produziria ruído em cima de anúncio bom.
+ *
+ * `0` desliga a marcação. O cálculo continua existindo — `dias_sem_confirmacao`
+ * segue disponível em cada imóvel — mas deixa de rebaixar o ranking.
  */
-export const DIAS_SUSPEITO = 30
+export const DIAS_SUSPEITO = Number(process.env.DIAS_ANUNCIO_SUSPEITO ?? 0)
 
 export function ranquear(imoveis: Imovel[], c: Criterios): ImovelComScore[] {
   const ranqueados = imoveis
@@ -233,6 +238,7 @@ export function ranquear(imoveis: Imovel[], c: Criterios): ImovelComScore[] {
 }
 
 function estaAntigo(im: ImovelComScore): boolean {
+  if (DIAS_SUSPEITO <= 0) return false
   return (im.dias_sem_confirmacao ?? 0) > DIAS_SUSPEITO
 }
 

@@ -41,3 +41,49 @@ export async function acaoSair() {
   await fecharSessao()
   redirect('/')
 }
+
+/**
+ * Ajusta os parâmetros da conta.
+ *
+ * Os três valores entram em contas de painel: a comissão define a comissão
+ * potencial, a mensalidade é o divisor do múltiplo de retorno, e os minutos por
+ * 30 imóveis são o parâmetro das horas economizadas — que o documento exige que
+ * seja ajustável, justamente para o corretor poder discordar do número em vez
+ * de desconfiar dele.
+ */
+export async function acaoSalvarConta(_: unknown, form: FormData) {
+  const { usuarioAtual, VE_DIRETORIA } = await import('./auth')
+  const { getPool } = await import('./db')
+  const { revalidatePath } = await import('next/cache')
+
+  const u = await usuarioAtual()
+  if (!u) return { erro: 'Sessão expirada.' }
+  // Parâmetro que muda indicador de retorno é decisão de quem assina.
+  if (!VE_DIRETORIA.includes(u.papel)) return { erro: 'Só a diretoria altera estes valores.' }
+
+  const num = (campo: string) => {
+    const bruto = form.get(campo)
+    if (bruto == null || String(bruto).trim() === '') return null
+    const n = Number(String(bruto).replace(',', '.'))
+    return Number.isFinite(n) && n >= 0 ? n : null
+  }
+
+  const comissao = num('comissao_pct')
+  const mensalidade = num('mensalidade')
+  const minutos = num('min_por_30_imoveis')
+
+  if (comissao == null || comissao > 100) return { erro: 'Comissão deve ficar entre 0 e 100%.' }
+  if (minutos == null || minutos < 1 || minutos > 240) {
+    return { erro: 'Minutos por 30 imóveis deve ficar entre 1 e 240.' }
+  }
+
+  await getPool().query(
+    `UPDATE contas SET comissao_pct = $2, mensalidade = $3, min_por_30_imoveis = $4
+     WHERE id = $1`,
+    [u.conta_id, comissao, mensalidade, minutos]
+  )
+
+  revalidatePath('/painel')
+  revalidatePath('/painel/diretoria')
+  return { ok: 'Salvo.' }
+}

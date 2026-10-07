@@ -16,6 +16,7 @@ export default async function LayoutPainel({ children }: { children: React.React
     { href: '/painel', rotulo: 'Meu mês', visivel: true },
     { href: '/painel/equipe', rotulo: 'Equipe', visivel: VE_EQUIPE.includes(u.papel) },
     { href: '/painel/diretoria', rotulo: 'Diretoria', visivel: VE_DIRETORIA.includes(u.papel) },
+    { href: '/painel/conta', rotulo: 'Conta', visivel: VE_DIRETORIA.includes(u.papel) },
   ].filter((a) => a.visivel)
 
   return (

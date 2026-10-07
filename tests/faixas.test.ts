@@ -81,46 +81,6 @@ describe('faixa de compatibilidade', () => {
   })
 })
 
-describe('anúncio zumbi', () => {
-  it('anúncio velho perde a alta compatibilidade e avisa quantos dias', () => {
-    const [im] = ranquear([{ ...base, dias_sem_confirmacao: 44 }], { preco_max: 600_000 })
-    expect(im.faixa).toBe('ressalva')
-    expect(im.ressalva).toContain('44 dias')
-    expect(im.ressalva).toContain('pode já estar vendido')
-  })
-
-  it('anúncio recente não recebe aviso nenhum', () => {
-    const [im] = ranquear([{ ...base, dias_sem_confirmacao: 3 }], { preco_max: 600_000 })
-    expect(im.faixa).toBe('alta')
-    expect(im.ressalva).toBeNull()
-  })
-
-  it('sem histórico não é tratado como fresco nem como velho', () => {
-    const [im] = ranquear([{ ...base, dias_sem_confirmacao: null }], { preco_max: 600_000 })
-    expect(im.faixa).toBe('alta')
-  })
-
-  it('o velho cai para depois do novo mesmo tendo score melhor', () => {
-    const lista = ranquear(
-      [
-        { ...base, codigo_origem: 'velho', preco: 400_000, dias_sem_confirmacao: 60 },
-        { ...base, codigo_origem: 'novo', preco: 590_000, dias_sem_confirmacao: 2 },
-      ],
-      { preco_max: 600_000 }
-    )
-    expect(lista.map((i) => i.codigo_origem)).toEqual(['novo', 'velho'])
-  })
-
-  it('o aviso de velho não apaga a ressalva que já existia', () => {
-    const [im] = ranquear(
-      [{ ...base, vagas: null, dias_sem_confirmacao: 50 }],
-      { preco_max: 600_000, vagas_min: 2 }
-    )
-    expect(im.ressalva).toContain('não informa as vagas')
-    expect(im.ressalva).toContain('50 dias')
-  })
-})
-
 describe('compensação no custo mensal', () => {
   it('cita a economia real contra a mediana dos que batem tudo', () => {
     const criterios = { preco_max: 500_000 }

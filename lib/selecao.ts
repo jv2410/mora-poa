@@ -215,6 +215,8 @@ export async function registrarBusca(args: {
   criterios: unknown
   alta: number
   valeApresentar: number
+  /** Quantos imóveis o motor varreu para produzir este resultado. */
+  analisados?: number | null
 }): Promise<number | null> {
   try {
     // usuario_id é o que o painel agrega. Sem ele, a busca de alguém logado
@@ -222,8 +224,9 @@ export async function registrarBusca(args: {
     // serve para o histórico anônimo de antes do login.
     const { rows } = await getPool().query(
       `INSERT INTO buscas
-         (corretor_id, usuario_id, briefing, criterios, alta, vale_apresentar)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+         (corretor_id, usuario_id, briefing, criterios, alta, vale_apresentar,
+          analisados)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
       [
         args.corretorId,
         args.usuarioId ?? null,
@@ -231,6 +234,7 @@ export async function registrarBusca(args: {
         JSON.stringify(args.criterios ?? {}),
         args.alta,
         args.valeApresentar,
+        args.analisados ?? null,
       ]
     )
     return rows[0].id

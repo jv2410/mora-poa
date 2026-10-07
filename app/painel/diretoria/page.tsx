@@ -17,7 +17,7 @@ export default async function Diretoria() {
   const [ef, qa, com, matriz] = await Promise.all([
     eficiencia(ids, u.min_por_30_imoveis),
     qualidade(ids),
-    comercial(ids),
+    comercial(ids, u.mensalidade, u.comissao_pct),
     adocaoPorCorretor(u.conta_id),
   ])
 
@@ -31,8 +31,8 @@ export default async function Diretoria() {
           <span className="eyebrow">Diretoria · 30 dias</span>
           <h2>Isso me dá retorno?</h2>
           <p>
-            Uma tela feita para ser printada e mandada no grupo dos sócios. O que a MORA mede
-            está preenchido; o que depende do CRM está marcado, não estimado.
+            Do briefing à venda fechada, com a conversão entre cada etapa. Feita para ser
+            printada e mandada no grupo dos sócios.
           </p>
         </div>
 
@@ -50,16 +50,15 @@ export default async function Diretoria() {
                 : 'Mensalidade do plano.'}
             </p>
           </div>
-          <div
-            className="card"
-            style={{ borderStyle: 'dashed', background: 'var(--elev)' }}
-          >
+          <div className="card" style={{ borderColor: 'var(--green)' }}>
             <span className="tag">Múltiplo de retorno</span>
-            <p style={{ fontSize: 36, fontWeight: 800, margin: '6px 0', color: 'var(--muted-2)' }}>
-              —
+            <p style={{ fontSize: 36, fontWeight: 800, margin: '6px 0', color: 'var(--green)' }}>
+              {com.multiplo_retorno == null ? '—' : `${com.multiplo_retorno}×`}
             </p>
-            <p style={{ color: 'var(--muted-2)', fontSize: 14 }}>
-              Comissão influenciada ÷ mensalidade. Depende da venda, que vem do CRM.
+            <p style={{ color: 'var(--muted)', fontSize: 14 }}>
+              {com.multiplo_retorno == null
+                ? 'Informe a mensalidade no cadastro para calcular.'
+                : `${brl(com.comissao_potencial)} de comissão influenciada sobre a mensalidade.`}
             </p>
           </div>
           <div className="card">
@@ -78,40 +77,46 @@ export default async function Diretoria() {
         <h3 style={{ marginBottom: 16 }}>Funil MORA</h3>
         <div style={{ marginBottom: 40 }}>
           {[
-            { etapa: 'Briefings', n: qa.buscas, medido: true },
-            { etapa: 'Seleções enviadas', n: qa.selecoes_enviadas, medido: true },
-            { etapa: 'Imóveis enviados', n: qa.imoveis_enviados, medido: true },
-            { etapa: 'Aprovados pelo comprador', n: qa.aprovados_comprador, medido: true },
-            { etapa: 'Visitas', n: null, medido: false },
-            { etapa: 'Propostas', n: null, medido: false },
-            { etapa: 'Vendas', n: null, medido: false },
-          ].map((e) => (
-            <div
-              key={e.etapa}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: 16,
-                padding: '14px 18px',
-                borderBottom: '1px solid var(--line)',
-                opacity: e.medido ? 1 : 0.55,
-              }}
-            >
-              <span style={{ fontSize: 15, fontWeight: e.medido ? 600 : 400 }}>
-                {e.etapa}
-                {!e.medido ? (
-                  <span style={{ color: 'var(--ressalva)', fontSize: 12.5, fontWeight: 400 }}>
-                    {' '}
-                    · vem do CRM
-                  </span>
-                ) : null}
-              </span>
-              <b style={{ fontSize: 20, color: e.medido ? 'var(--ink)' : 'var(--muted-2)' }}>
-                {e.n == null ? '—' : e.n}
-              </b>
-            </div>
-          ))}
+            // "Imóveis enviados" fica fora da sequência de propósito: ele não
+            // é um estágio, é a contagem de itens dentro das seleções. Entre
+            // 26 seleções e 112 imóveis a divisão daria 431%, que não é
+            // conversão nenhuma — é a média de imóveis por seleção disfarçada
+            // de taxa.
+            { etapa: 'Briefings', n: qa.buscas },
+            { etapa: 'Seleções enviadas', n: qa.selecoes_enviadas },
+            { etapa: 'Aprovados pelo comprador', n: qa.aprovados_comprador },
+            { etapa: 'Visitas', n: com.visitas },
+            { etapa: 'Propostas', n: com.propostas },
+            { etapa: 'Vendas', n: com.vendas },
+          ].map((e, i, todas) => {
+            // Conversão contra a etapa anterior: é onde se ganha e onde se
+            // perde, e sem isso o funil vira uma lista de números soltos.
+            const anterior = i === 0 ? null : todas[i - 1].n
+            const conversao =
+              anterior && anterior > 0 ? Math.round((e.n / anterior) * 100) : null
+
+            return (
+              <div
+                key={e.etapa}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: '14px 18px',
+                  borderBottom: '1px solid var(--line)',
+                }}
+              >
+                <span style={{ fontSize: 15, fontWeight: 600 }}>{e.etapa}</span>
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+                  {conversao != null ? (
+                    <span style={{ fontSize: 13, color: 'var(--muted-2)' }}>{conversao}%</span>
+                  ) : null}
+                  <b style={{ fontSize: 20 }}>{e.n}</b>
+                </span>
+              </div>
+            )
+          })}
         </div>
 
         {/* ---------------- Adoção ---------------- */}
@@ -127,7 +132,7 @@ export default async function Diretoria() {
           </p>
         </div>
 
-        <BlocoCRM aprovacoes={com.aprovacoes_comprador} compacto />
+        <BlocoCRM dados={com} compacto />
       </div>
     </section>
   )
