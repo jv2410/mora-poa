@@ -1,0 +1,37 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - link "MORA.AI" [ref=e4] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e5]:
+      - link "Briefing" [ref=e6] [cursor=pointer]:
+        - /url: /chat
+      - link "Imóveis" [ref=e7] [cursor=pointer]:
+        - /url: /imoveis
+      - link "Mercado" [ref=e8] [cursor=pointer]:
+        - /url: /mercado
+      - link "Estoque" [ref=e9] [cursor=pointer]:
+        - /url: /estoque
+      - link "Orçamento" [ref=e10] [cursor=pointer]:
+        - /url: /orcamento
+      - link "Dados" [ref=e11] [cursor=pointer]:
+        - /url: /dados
+      - link "Painel" [ref=e12] [cursor=pointer]:
+        - /url: /painel
+  - generic [ref=e14]:
+    - generic [ref=e15]: Entrar
+    - heading "Bem-vindo de volta." [level=2] [ref=e16]
+    - paragraph [ref=e17]: Suas buscas e seleções continuam onde você parou.
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: E-mail
+        - textbox "E-mail" [ref=e21]
+      - generic [ref=e22]:
+        - generic [ref=e23]: Senha
+        - textbox "Senha" [ref=e24]
+      - button "Entrar" [ref=e25] [cursor=pointer]
+      - paragraph [ref=e26]:
+        - text: Ainda não tem conta?
+        - link "criar conta" [ref=e27] [cursor=pointer]:
+          - /url: /criar-conta
+  - button "Abrir conversa" [ref=e28] [cursor=pointer]: Falar com a IA
+  - alert [ref=e30]

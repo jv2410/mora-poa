@@ -1,0 +1,474 @@
+- generic [active] [ref=f1e1]:
+  - navigation [ref=f1e3]:
+    - link "MORA.AI" [ref=f1e4] [cursor=pointer]:
+      - /url: /
+    - generic [ref=f1e5]:
+      - link "Briefing" [ref=f1e6] [cursor=pointer]:
+        - /url: /chat
+      - link "Imóveis" [ref=f1e7] [cursor=pointer]:
+        - /url: /imoveis
+      - link "Mercado" [ref=f1e8] [cursor=pointer]:
+        - /url: /mercado
+      - link "Estoque" [ref=f1e9] [cursor=pointer]:
+        - /url: /estoque
+      - link "Orçamento" [ref=f1e10] [cursor=pointer]:
+        - /url: /orcamento
+      - link "Dados" [ref=f1e11] [cursor=pointer]:
+        - /url: /dados
+      - link "Painel" [ref=f1e12] [cursor=pointer]:
+        - /url: /painel
+  - generic [ref=f1e14]:
+    - generic [ref=f1e15]:
+      - generic [ref=f1e16]: Catálogo
+      - heading "100 imóveis" [level=2] [ref=f1e17]
+      - paragraph [ref=f1e18]: Filtrar aqui funciona, mas é o jeito antigo. Se quiser dizer o que procura em português, o chat entende melhor — e ainda compara com o mercado do bairro.
+    - generic [ref=f1e19]:
+      - link "Todos os bairros" [ref=f1e20] [cursor=pointer]:
+        - /url: /imoveis
+      - link "Petrópolis" [ref=f1e21] [cursor=pointer]:
+        - /url: /imoveis?bairro=Petr%C3%B3polis
+      - link "Moinhos de Vento" [ref=f1e22] [cursor=pointer]:
+        - /url: /imoveis?bairro=Moinhos+de+Vento
+      - link "Bela Vista" [ref=f1e23] [cursor=pointer]:
+        - /url: /imoveis?bairro=Bela+Vista
+      - link "Auxiliadora" [ref=f1e24] [cursor=pointer]:
+        - /url: /imoveis?bairro=Auxiliadora
+      - link "Bom Fim" [ref=f1e25] [cursor=pointer]:
+        - /url: /imoveis?bairro=Bom+Fim
+      - link "Santana" [ref=f1e26] [cursor=pointer]:
+        - /url: /imoveis?bairro=Santana
+      - link "Cidade Baixa" [ref=f1e27] [cursor=pointer]:
+        - /url: /imoveis?bairro=Cidade+Baixa
+      - link "Jardim Europa" [ref=f1e28] [cursor=pointer]:
+        - /url: /imoveis?bairro=Jardim+Europa
+      - link "Humaitá" [ref=f1e29] [cursor=pointer]:
+        - /url: /imoveis?bairro=Humait%C3%A1
+      - link "Menino Deus" [ref=f1e30] [cursor=pointer]:
+        - /url: /imoveis?bairro=Menino+Deus
+      - link "Centro Histórico" [ref=f1e31] [cursor=pointer]:
+        - /url: /imoveis?bairro=Centro+Hist%C3%B3rico
+      - link "Morro Santana" [ref=f1e32] [cursor=pointer]:
+        - /url: /imoveis?bairro=Morro+Santana
+      - link "Rubem Berta" [ref=f1e33] [cursor=pointer]:
+        - /url: /imoveis?bairro=Rubem+Berta
+      - link "Farrapos" [ref=f1e34] [cursor=pointer]:
+        - /url: /imoveis?bairro=Farrapos
+    - generic [ref=f1e35]:
+      - link "até 400 mil" [ref=f1e36] [cursor=pointer]:
+        - /url: /imoveis?preco_max=400000
+      - link "até 600 mil" [ref=f1e37] [cursor=pointer]:
+        - /url: /imoveis?preco_max=600000
+      - link "até 900 mil" [ref=f1e38] [cursor=pointer]:
+        - /url: /imoveis?preco_max=900000
+      - link "1+ dorm" [ref=f1e39] [cursor=pointer]:
+        - /url: /imoveis?dorm=1
+      - link "2+ dorm" [ref=f1e40] [cursor=pointer]:
+        - /url: /imoveis?dorm=2
+      - link "3+ dorm" [ref=f1e41] [cursor=pointer]:
+        - /url: /imoveis?dorm=3
+    - generic [ref=f1e42]:
+      - link [ref=f1e43] [cursor=pointer]:
+        - /url: /imovel/301
+        - heading "R$ 110.000" [level=3] [ref=f1e44]
+        - paragraph [ref=f1e45]: Rubem Berta · 2 dorm · 39 m² · 1 vaga
+      - link [ref=f1e46] [cursor=pointer]:
+        - /url: /imovel/307
+        - heading "R$ 110.000" [level=3] [ref=f1e47]
+        - paragraph [ref=f1e48]: Rubem Berta · 2 dorm · 43 m² · 1 vaga
+      - link [ref=f1e49] [cursor=pointer]:
+        - /url: /imovel/310
+        - heading "R$ 145.000" [level=3] [ref=f1e50]
+        - paragraph [ref=f1e51]: Restinga · 2 dorm · 39 m² · 1 vaga
+      - link [ref=f1e52] [cursor=pointer]:
+        - /url: /imovel/323
+        - heading "R$ 159.000" [level=3] [ref=f1e53]
+        - paragraph [ref=f1e54]: Bom Jesus · ? dorm · 43 m² · 1 vaga
+      - link [ref=f1e55] [cursor=pointer]:
+        - /url: /imovel/256
+        - heading "R$ 160.000" [level=3] [ref=f1e56]
+        - paragraph [ref=f1e57]: Santana · 1 dorm · 34 m²
+      - link [ref=f1e58] [cursor=pointer]:
+        - /url: /imovel/39
+        - heading "R$ 160.000" [level=3] [ref=f1e59]
+        - paragraph [ref=f1e60]: Cidade Baixa · 1 dorm · 37 m²
+      - link [ref=f1e61] [cursor=pointer]:
+        - /url: /imovel/311
+        - heading "R$ 180.000" [level=3] [ref=f1e62]
+        - paragraph [ref=f1e63]: Sarandi · 2 dorm · 40 m² · 1 vaga
+      - link [ref=f1e64] [cursor=pointer]:
+        - /url: /imovel/115
+        - heading "R$ 185.000" [level=3] [ref=f1e65]
+        - paragraph [ref=f1e66]: Petrópolis · 2 dorm · 39 m²
+      - link [ref=f1e67] [cursor=pointer]:
+        - /url: /imovel/73
+        - heading "R$ 190.000" [level=3] [ref=f1e68]
+        - paragraph [ref=f1e69]: Santana · 1 dorm · 29 m²
+      - link [ref=f1e70] [cursor=pointer]:
+        - /url: /imovel/254
+        - heading "R$ 191.000" [level=3] [ref=f1e71]
+        - paragraph [ref=f1e72]: Santana · 1 dorm · 45 m²
+      - link [ref=f1e73] [cursor=pointer]:
+        - /url: /imovel/291
+        - heading "R$ 199.000" [level=3] [ref=f1e74]
+        - paragraph [ref=f1e75]: Jardim Itu · 2 dorm · 40 m² · 1 vaga
+      - link [ref=f1e76] [cursor=pointer]:
+        - /url: /imovel/249
+        - heading "R$ 200.000" [level=3] [ref=f1e77]
+        - paragraph [ref=f1e78]: Cidade Baixa · 1 dorm · 37 m²
+      - link [ref=f1e79] [cursor=pointer]:
+        - /url: /imovel/413
+        - heading "R$ 200.000" [level=3] [ref=f1e80]
+        - paragraph [ref=f1e81]: Jardim Leopoldina · 2 dorm · 42 m² · 1 vaga
+      - link [ref=f1e82] [cursor=pointer]:
+        - /url: /imovel/407
+        - heading "R$ 200.000" [level=3] [ref=f1e83]
+        - paragraph [ref=f1e84]: Vila Nova · 2 dorm · 45 m² · 1 vaga
+      - link [ref=f1e85] [cursor=pointer]:
+        - /url: /imovel/406
+        - heading "R$ 200.000" [level=3] [ref=f1e86]
+        - paragraph [ref=f1e87]: Chácara das Pedras · 2 dorm · 47 m² · 1 vaga
+      - link [ref=f1e88] [cursor=pointer]:
+        - /url: /imovel/382
+        - heading "R$ 200.000" [level=3] [ref=f1e89]
+        - paragraph [ref=f1e90]: Parque Santa Fé · 2 dorm · 48 m² · 1 vaga
+      - link [ref=f1e91] [cursor=pointer]:
+        - /url: /imovel/449
+        - heading "R$ 200.000" [level=3] [ref=f1e92]
+        - paragraph [ref=f1e93]: Cristal · 1 dorm · 58 m² · 1 vaga
+      - link [ref=f1e94] [cursor=pointer]:
+        - /url: /imovel/439
+        - heading "R$ 200.000" [level=3] [ref=f1e95]
+        - paragraph [ref=f1e96]: Medianeira · 2 dorm · 61 m² · 1 vaga
+      - link [ref=f1e97] [cursor=pointer]:
+        - /url: /imovel/419
+        - heading "R$ 200.000" [level=3] [ref=f1e98]
+        - paragraph [ref=f1e99]: Protásio Alves · 2 dorm · 72 m² · 1 vaga
+      - link [ref=f1e100] [cursor=pointer]:
+        - /url: /imovel/364
+        - heading "R$ 200.000" [level=3] [ref=f1e101]
+        - paragraph [ref=f1e102]: Centro Histórico · 1 dorm · 79 m²
+      - link [ref=f1e103] [cursor=pointer]:
+        - /url: /imovel/366
+        - heading "R$ 205.000" [level=3] [ref=f1e104]
+        - paragraph [ref=f1e105]: Cavalhada · 2 dorm · 40 m² · 1 vaga
+      - link [ref=f1e106] [cursor=pointer]:
+        - /url: /imovel/400
+        - heading "R$ 205.000" [level=3] [ref=f1e107]
+        - paragraph [ref=f1e108]: Auxiliadora · 1 dorm · 53 m²
+      - link [ref=f1e109] [cursor=pointer]:
+        - /url: /imovel/380
+        - heading "R$ 209.500" [level=3] [ref=f1e110]
+        - paragraph [ref=f1e111]: Vila Nova · 2 dorm · 45 m² · 1 vaga
+      - link [ref=f1e112] [cursor=pointer]:
+        - /url: /imovel/124
+        - heading "R$ 210.000" [level=3] [ref=f1e113]
+        - paragraph [ref=f1e114]: Petrópolis · 1 dorm · 39.49 m²
+      - link [ref=f1e115] [cursor=pointer]:
+        - /url: /imovel/74
+        - heading "R$ 213.000" [level=3] [ref=f1e116]
+        - paragraph [ref=f1e117]: Santana · 1 dorm · 54 m²
+      - link [ref=f1e118] [cursor=pointer]:
+        - /url: /imovel/255
+        - heading "R$ 215.000" [level=3] [ref=f1e119]
+        - paragraph [ref=f1e120]: Santana · 1 dorm · 32 m²
+      - link [ref=f1e121] [cursor=pointer]:
+        - /url: /imovel/393
+        - heading "R$ 215.000" [level=3] [ref=f1e122]
+        - paragraph [ref=f1e123]: Morro Santana · 2 dorm · 50 m² · 1 vaga
+        - paragraph [ref=f1e124]: ⚠ dados inconsistentes no anúncio original
+      - link [ref=f1e125] [cursor=pointer]:
+        - /url: /imovel/190
+        - heading "R$ 215.000" [level=3] [ref=f1e126]
+        - paragraph [ref=f1e127]: Jardim Europa · 1 dorm · 52 m²
+      - link [ref=f1e128] [cursor=pointer]:
+        - /url: /imovel/383
+        - heading "R$ 219.000" [level=3] [ref=f1e129]
+        - paragraph [ref=f1e130]: Rubem Berta · 1 dorm · 44 m² · 1 vaga
+      - link [ref=f1e131] [cursor=pointer]:
+        - /url: /imovel/29
+        - heading "R$ 220.000" [level=3] [ref=f1e132]
+        - paragraph [ref=f1e133]: Cidade Baixa · 1 dorm · 35 m²
+      - link [ref=f1e134] [cursor=pointer]:
+        - /url: /imovel/379
+        - heading "R$ 220.000" [level=3] [ref=f1e135]
+        - paragraph [ref=f1e136]: Rubem Berta · 1 dorm · 45 m² · 1 vaga
+      - link [ref=f1e137] [cursor=pointer]:
+        - /url: /imovel/445
+        - heading "R$ 220.000" [level=3] [ref=f1e138]
+        - paragraph [ref=f1e139]: São José · 2 dorm · 51 m² · 1 vaga
+      - link [ref=f1e140] [cursor=pointer]:
+        - /url: /imovel/263
+        - heading "R$ 220.000" [level=3] [ref=f1e141]
+        - paragraph [ref=f1e142]: Santana · 1 dorm · 54 m² · 1 vaga
+      - link [ref=f1e143] [cursor=pointer]:
+        - /url: /imovel/328
+        - heading "R$ 220.000" [level=3] [ref=f1e144]
+        - paragraph [ref=f1e145]: Partenon · 2 dorm · 74 m²
+      - link [ref=f1e146] [cursor=pointer]:
+        - /url: /imovel/197
+        - heading "R$ 223.200" [level=3] [ref=f1e147]
+        - paragraph [ref=f1e148]: Moinhos de Vento · 2 dorm · 45.7 m²
+      - link [ref=f1e149] [cursor=pointer]:
+        - /url: /imovel/359
+        - heading "R$ 225.000" [level=3] [ref=f1e150]
+        - paragraph [ref=f1e151]: Humaitá · 2 dorm · 46 m² · 1 vaga
+      - link [ref=f1e152] [cursor=pointer]:
+        - /url: /imovel/147
+        - heading "R$ 226.100" [level=3] [ref=f1e153]
+        - paragraph [ref=f1e154]: Auxiliadora · 1 dorm · 44.81 m²
+      - link [ref=f1e155] [cursor=pointer]:
+        - /url: /imovel/131
+        - heading "R$ 229.500" [level=3] [ref=f1e156]
+        - paragraph [ref=f1e157]: Auxiliadora · 1 dorm · 40.2 m²
+      - link [ref=f1e158] [cursor=pointer]:
+        - /url: /imovel/433
+        - heading "R$ 230.000" [level=3] [ref=f1e159]
+        - paragraph [ref=f1e160]: Morro Santana · 2 dorm · 48 m² · 1 vaga
+      - link [ref=f1e161] [cursor=pointer]:
+        - /url: /imovel/389
+        - heading "R$ 230.000" [level=3] [ref=f1e162]
+        - paragraph [ref=f1e163]: Passo das Pedras · 2 dorm · 48 m² · 1 vaga
+      - link [ref=f1e164] [cursor=pointer]:
+        - /url: /imovel/420
+        - heading "R$ 230.000" [level=3] [ref=f1e165]
+        - paragraph [ref=f1e166]: Rubem Berta · 2 dorm · 48 m² · 1 vaga
+      - link [ref=f1e167] [cursor=pointer]:
+        - /url: /imovel/343
+        - heading "R$ 230.000" [level=3] [ref=f1e168]
+        - paragraph [ref=f1e169]: Costa e Silva · 2 dorm · 49 m² · 1 vaga
+      - link [ref=f1e170] [cursor=pointer]:
+        - /url: /imovel/408
+        - heading "R$ 230.000" [level=3] [ref=f1e171]
+        - paragraph [ref=f1e172]: Jardim Itu Sabará · 2 dorm · 55 m² · 1 vaga
+      - link [ref=f1e173] [cursor=pointer]:
+        - /url: /imovel/340
+        - heading "R$ 230.000" [level=3] [ref=f1e174]
+        - paragraph [ref=f1e175]: Jardim Leopoldina · 2 dorm · 56 m² · 1 vaga
+      - link [ref=f1e176] [cursor=pointer]:
+        - /url: /imovel/367
+        - heading "R$ 232.000" [level=3] [ref=f1e177]
+        - paragraph [ref=f1e178]: Vila Nova · 2 dorm · 49 m² · 1 vaga
+      - link [ref=f1e179] [cursor=pointer]:
+        - /url: /imovel/132
+        - heading "R$ 232.750" [level=3] [ref=f1e180]
+        - paragraph [ref=f1e181]: Auxiliadora · 1 dorm · 44.81 m²
+      - link [ref=f1e182] [cursor=pointer]:
+        - /url: /imovel/107
+        - heading "R$ 234.000" [level=3] [ref=f1e183]
+        - paragraph [ref=f1e184]: Petrópolis · 1 dorm · 45 m²
+      - link [ref=f1e185] [cursor=pointer]:
+        - /url: /imovel/348
+        - heading "R$ 235.000" [level=3] [ref=f1e186]
+        - paragraph [ref=f1e187]: Rubem Berta · 2 dorm · 51 m² · 1 vaga
+      - link [ref=f1e188] [cursor=pointer]:
+        - /url: /imovel/269
+        - heading "R$ 240.000" [level=3] [ref=f1e189]
+        - paragraph [ref=f1e190]: Auxiliadora · 1 dorm · 30 m²
+      - link [ref=f1e191] [cursor=pointer]:
+        - /url: /imovel/266
+        - heading "R$ 240.000" [level=3] [ref=f1e192]
+        - paragraph [ref=f1e193]: Auxiliadora · 1 dorm · 45 m² · 1 vaga
+        - paragraph [ref=f1e194]: ⚠ dados inconsistentes no anúncio original
+      - link [ref=f1e195] [cursor=pointer]:
+        - /url: /imovel/309
+        - heading "R$ 240.000" [level=3] [ref=f1e196]
+        - paragraph [ref=f1e197]: Restinga · 1 dorm · 45 m² · 1 vaga
+      - link [ref=f1e198] [cursor=pointer]:
+        - /url: /imovel/446
+        - heading "R$ 240.000" [level=3] [ref=f1e199]
+        - paragraph [ref=f1e200]: Farrapos · 2 dorm · 50 m² · 1 vaga
+      - link [ref=f1e201] [cursor=pointer]:
+        - /url: /imovel/346
+        - heading "R$ 240.000" [level=3] [ref=f1e202]
+        - paragraph [ref=f1e203]: Humaitá · 2 dorm · 52 m² · 1 vaga
+      - link [ref=f1e204] [cursor=pointer]:
+        - /url: /imovel/422
+        - heading "R$ 240.000" [level=3] [ref=f1e205]
+        - paragraph [ref=f1e206]: Jardim Itu Sabará · 2 dorm · 52 m² · 1 vaga
+      - link [ref=f1e207] [cursor=pointer]:
+        - /url: /imovel/432
+        - heading "R$ 240.000" [level=3] [ref=f1e208]
+        - paragraph [ref=f1e209]: Parque Santa Fé · 2 dorm · 63 m² · 1 vaga
+      - link [ref=f1e210] [cursor=pointer]:
+        - /url: /imovel/397
+        - heading "R$ 240.000" [level=3] [ref=f1e211]
+        - paragraph [ref=f1e212]: Navegantes · 3 dorm · 110 m² · 1 vaga
+      - link [ref=f1e213] [cursor=pointer]:
+        - /url: /imovel/415
+        - heading "R$ 240.500" [level=3] [ref=f1e214]
+        - paragraph [ref=f1e215]: Partenon · 2 dorm · 47 m² · 1 vaga
+      - link [ref=f1e216] [cursor=pointer]:
+        - /url: /imovel/428
+        - heading "R$ 243.000" [level=3] [ref=f1e217]
+        - paragraph [ref=f1e218]: Humaitá · 2 dorm · 49 m² · 1 vaga
+      - link [ref=f1e219] [cursor=pointer]:
+        - /url: /imovel/395
+        - heading "R$ 245.000" [level=3] [ref=f1e220]
+        - paragraph [ref=f1e221]: Santo Antônio · 1 dorm · 43 m² · 1 vaga
+      - link [ref=f1e222] [cursor=pointer]:
+        - /url: /imovel/434
+        - heading "R$ 245.000" [level=3] [ref=f1e223]
+        - paragraph [ref=f1e224]: Centro Histórico · 2 dorm · 64 m²
+      - link [ref=f1e225] [cursor=pointer]:
+        - /url: /imovel/438
+        - heading "R$ 245.000" [level=3] [ref=f1e226]
+        - paragraph [ref=f1e227]: Costa e Silva · 2 dorm · 65 m² · 1 vaga
+      - link [ref=f1e228] [cursor=pointer]:
+        - /url: /imovel/327
+        - heading "R$ 245.000" [level=3] [ref=f1e229]
+        - paragraph [ref=f1e230]: Azenha · 3 dorm · 88 m²
+      - link [ref=f1e231] [cursor=pointer]:
+        - /url: /imovel/392
+        - heading "R$ 245.000" [level=3] [ref=f1e232]
+        - paragraph [ref=f1e233]: Navegantes · 3 dorm · 97 m²
+      - link [ref=f1e234] [cursor=pointer]:
+        - /url: /imovel/356
+        - heading "R$ 247.000" [level=3] [ref=f1e235]
+        - paragraph [ref=f1e236]: Parque Santa Fé · 2 dorm · 48 m² · 1 vaga
+      - link [ref=f1e237] [cursor=pointer]:
+        - /url: /imovel/368
+        - heading "R$ 249.000" [level=3] [ref=f1e238]
+        - paragraph [ref=f1e239]: Morro Santana · 2 dorm · 50 m² · 1 vaga
+      - link [ref=f1e240] [cursor=pointer]:
+        - /url: /imovel/233
+        - heading "R$ 250.000" [level=3] [ref=f1e241]
+        - paragraph [ref=f1e242]: Moinhos de Vento · 1 dorm · 44 m²
+      - link [ref=f1e243] [cursor=pointer]:
+        - /url: /imovel/259
+        - heading "R$ 250.000" [level=3] [ref=f1e244]
+        - paragraph [ref=f1e245]: Santana · 1 dorm · 45 m² · 1 vaga
+      - link [ref=f1e246] [cursor=pointer]:
+        - /url: /imovel/390
+        - heading "R$ 250.000" [level=3] [ref=f1e247]
+        - paragraph [ref=f1e248]: Rubem Berta · 2 dorm · 47 m² · 1 vaga
+      - link [ref=f1e249] [cursor=pointer]:
+        - /url: /imovel/262
+        - heading "R$ 250.000" [level=3] [ref=f1e250]
+        - paragraph [ref=f1e251]: Santana · 1 dorm · 51 m²
+      - link [ref=f1e252] [cursor=pointer]:
+        - /url: /imovel/322
+        - heading "R$ 250.000" [level=3] [ref=f1e253]
+        - paragraph [ref=f1e254]: Vila São José · 2 dorm · 51 m²
+      - link [ref=f1e255] [cursor=pointer]:
+        - /url: /imovel/441
+        - heading "R$ 250.000" [level=3] [ref=f1e256]
+        - paragraph [ref=f1e257]: Humaitá · 2 dorm · 55 m² · 1 vaga
+      - link [ref=f1e258] [cursor=pointer]:
+        - /url: /imovel/292
+        - heading "R$ 250.000" [level=3] [ref=f1e259]
+        - paragraph [ref=f1e260]: Cristal · 2 dorm · 73 m² · 1 vaga
+      - link [ref=f1e261] [cursor=pointer]:
+        - /url: /imovel/243
+        - heading "R$ 259.000" [level=3] [ref=f1e262]
+        - paragraph [ref=f1e263]: Cidade Baixa · 1 dorm · 47 m² · 1 vaga
+      - link [ref=f1e264] [cursor=pointer]:
+        - /url: /imovel/443
+        - heading "R$ 259.000" [level=3] [ref=f1e265]
+        - paragraph [ref=f1e266]: Cristal · 2 dorm · 64 m² · 1 vaga
+      - link [ref=f1e267] [cursor=pointer]:
+        - /url: /imovel/294
+        - heading "R$ 259.990" [level=3] [ref=f1e268]
+        - paragraph [ref=f1e269]: Morro Santana · 2 dorm · 56 m² · 1 vaga
+      - link [ref=f1e270] [cursor=pointer]:
+        - /url: /imovel/144
+        - heading "R$ 260.000" [level=3] [ref=f1e271]
+        - paragraph [ref=f1e272]: Auxiliadora · 1 dorm · 40.09 m²
+      - link [ref=f1e273] [cursor=pointer]:
+        - /url: /imovel/333
+        - heading "R$ 260.000" [level=3] [ref=f1e274]
+        - paragraph [ref=f1e275]: Partenon · 1 dorm · 43 m²
+      - link [ref=f1e276] [cursor=pointer]:
+        - /url: /imovel/238
+        - heading "R$ 260.000" [level=3] [ref=f1e277]
+        - paragraph [ref=f1e278]: Menino Deus · 1 dorm · 45 m²
+        - paragraph [ref=f1e279]: ⚠ dados inconsistentes no anúncio original
+      - link [ref=f1e280] [cursor=pointer]:
+        - /url: /imovel/435
+        - heading "R$ 260.000" [level=3] [ref=f1e281]
+        - paragraph [ref=f1e282]: Praia de Belas · 2 dorm · 49 m²
+      - link [ref=f1e283] [cursor=pointer]:
+        - /url: /imovel/442
+        - heading "R$ 260.000" [level=3] [ref=f1e284]
+        - paragraph [ref=f1e285]: Parque Santa Fé · 2 dorm · 50 m² · 1 vaga
+      - link [ref=f1e286] [cursor=pointer]:
+        - /url: /imovel/386
+        - heading "R$ 260.000" [level=3] [ref=f1e287]
+        - paragraph [ref=f1e288]: Humaitá · 2 dorm · 60 m² · 1 vaga
+      - link [ref=f1e289] [cursor=pointer]:
+        - /url: /imovel/351
+        - heading "R$ 260.000" [level=3] [ref=f1e290]
+        - paragraph [ref=f1e291]: Passo da Areia · 2 dorm · 120 m²
+      - link [ref=f1e292] [cursor=pointer]:
+        - /url: /imovel/355
+        - heading "R$ 265.000" [level=3] [ref=f1e293]
+        - paragraph [ref=f1e294]: Morro Santana · 2 dorm · 49 m² · 1 vaga
+      - link [ref=f1e295] [cursor=pointer]:
+        - /url: /imovel/385
+        - heading "R$ 265.000" [level=3] [ref=f1e296]
+        - paragraph [ref=f1e297]: Farrapos · 2 dorm · 51 m² · 1 vaga
+      - link [ref=f1e298] [cursor=pointer]:
+        - /url: /imovel/297
+        - heading "R$ 270.000" [level=3] [ref=f1e299]
+        - paragraph [ref=f1e300]: Lomba do Pinheiro · 2 dorm · 47 m²
+      - link [ref=f1e301] [cursor=pointer]:
+        - /url: /imovel/330
+        - heading "R$ 270.000" [level=3] [ref=f1e302]
+        - paragraph [ref=f1e303]: Teresópolis · 2 dorm · 60 m² · 1 vaga
+      - link [ref=f1e304] [cursor=pointer]:
+        - /url: /imovel/405
+        - heading "R$ 270.000" [level=3] [ref=f1e305]
+        - paragraph [ref=f1e306]: Farrapos · 2 dorm · 65 m² · 1 vaga
+      - link [ref=f1e307] [cursor=pointer]:
+        - /url: /imovel/97
+        - heading "R$ 270.000" [level=3] [ref=f1e308]
+        - paragraph [ref=f1e309]: Petrópolis · 2 dorm · 68 m²
+      - link [ref=f1e310] [cursor=pointer]:
+        - /url: /imovel/424
+        - heading "R$ 272.000" [level=3] [ref=f1e311]
+        - paragraph [ref=f1e312]: Morro Santana · 2 dorm · 67 m² · 1 vaga
+      - link [ref=f1e313] [cursor=pointer]:
+        - /url: /imovel/244
+        - heading "R$ 274.000" [level=3] [ref=f1e314]
+        - paragraph [ref=f1e315]: Cidade Baixa · 1 dorm · 45 m²
+      - link [ref=f1e316] [cursor=pointer]:
+        - /url: /imovel/363
+        - heading "R$ 274.500" [level=3] [ref=f1e317]
+        - paragraph [ref=f1e318]: São Geraldo · 2 dorm · 57 m² · 1 vaga
+      - link [ref=f1e319] [cursor=pointer]:
+        - /url: /imovel/371
+        - heading "R$ 275.600" [level=3] [ref=f1e320]
+        - paragraph [ref=f1e321]: Tristeza · 1 dorm · 52 m²
+      - link [ref=f1e322] [cursor=pointer]:
+        - /url: /imovel/196
+        - heading "R$ 277.000" [level=3] [ref=f1e323]
+        - paragraph [ref=f1e324]: Jardim Europa · 1 dorm · 43.93 m²
+      - link [ref=f1e325] [cursor=pointer]:
+        - /url: /imovel/320
+        - heading "R$ 280.000" [level=3] [ref=f1e326]
+        - paragraph [ref=f1e327]: Cavalhada · 2 dorm · 47 m²
+      - link [ref=f1e328] [cursor=pointer]:
+        - /url: /imovel/265
+        - heading "R$ 280.000" [level=3] [ref=f1e329]
+        - paragraph [ref=f1e330]: Auxiliadora · 2 dorm · 60 m²
+      - link [ref=f1e331] [cursor=pointer]:
+        - /url: /imovel/411
+        - heading "R$ 280.000" [level=3] [ref=f1e332]
+        - paragraph [ref=f1e333]: Farrapos · 2 dorm · 64 m² · 1 vaga
+      - link [ref=f1e334] [cursor=pointer]:
+        - /url: /imovel/300
+        - heading "R$ 280.000" [level=3] [ref=f1e335]
+        - paragraph [ref=f1e336]: São Sebastião · 2 dorm · 64 m² · 1 vaga
+      - link [ref=f1e337] [cursor=pointer]:
+        - /url: /imovel/404
+        - heading "R$ 280.000" [level=3] [ref=f1e338]
+        - paragraph [ref=f1e339]: Cristal · 2 dorm · 70 m² · 1 vaga
+      - link [ref=f1e340] [cursor=pointer]:
+        - /url: /imovel/437
+        - heading "R$ 284.000" [level=3] [ref=f1e341]
+        - paragraph [ref=f1e342]: Sarandi · 2 dorm · 62 m² · 1 vaga
+      - link [ref=f1e343] [cursor=pointer]:
+        - /url: /imovel/402
+        - heading "R$ 285.000" [level=3] [ref=f1e344]
+        - paragraph [ref=f1e345]: Jardim Carvalho · 2 dorm · 57 m² · 1 vaga
+  - button "Abrir conversa" [ref=f1e346] [cursor=pointer]: Falar com a IA
+  - alert [ref=f1e348]
